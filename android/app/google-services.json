@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "613148055539",
+    "project_id": "workconnect-65a88",
+    "storage_bucket": "workconnect-65a88.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:613148055539:android:901e4a2d976e358f95a486",
+        "android_client_info": {
+          "package_name": "com.example.workconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKvI4qGwTWXRFJelUAP4egT-ZhzjwGyr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

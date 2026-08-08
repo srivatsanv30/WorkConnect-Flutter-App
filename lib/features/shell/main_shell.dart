@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_theme.dart';
-import '../auth/auth_service.dart';
-import '../auth/auth_screen.dart';
 import '../auth/user_model.dart';
 import '../home/home_overview_screen.dart';
 import '../hub/workspace_hub_screen.dart';
@@ -26,15 +23,6 @@ class _MainShellState extends State<MainShell> {
 
   String get _userName => widget.user?.name ?? 'there';
 
-  Future<void> _logout() async {
-    await AuthService().logout();
-    if (!mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const AuthScreen()),
-      (route) => false,
-    );
-  }
-
   void _goTo(int index) => setState(() => _index = index);
 
   @override
@@ -58,13 +46,6 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       appBar: AppBar(
         title: Text(titles[_index], style: const TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign Out',
-            onPressed: _logout,
-          ),
-        ],
       ),
       body: SafeArea(child: screens[_index]),
       bottomNavigationBar: BottomNavigationBar(

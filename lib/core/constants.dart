@@ -1,3 +1,6 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// App-wide constants.
 ///
 /// baseUrl depends on where you're running the app:
@@ -10,5 +13,13 @@ class AppConstants {
 
   static const String appName = 'WorkConnect';
 
-static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:5000/api';
+    } else if (Platform.isAndroid) {
+      return 'http://10.0.2.2:5000/api';
+    } else {
+      return 'http://localhost:5000/api';
+    }
+  }
 }

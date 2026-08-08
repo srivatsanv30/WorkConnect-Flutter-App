@@ -136,7 +136,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 controller: _bioController,
                 maxLines: 3,
                 decoration: const InputDecoration(
-                  hintText: 'Tell us about yourself...',
+                  hintText: 'Tell us about yourself',
                   prefixIcon: Padding(
                     padding: EdgeInsets.only(bottom: 40),
                     child: Icon(Icons.edit_note_outlined),
@@ -151,7 +151,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
-                  hintText: '+91 XXXXX XXXXX',
+                  hintText: '+91 ',
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
               ),
@@ -162,7 +162,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
               TextFormField(
                 controller: _locationController,
                 decoration: const InputDecoration(
-                  hintText: 'e.g. Chennai, India',
+                  hintText: '',
                   prefixIcon: Icon(Icons.location_on_outlined),
                 ),
               ),

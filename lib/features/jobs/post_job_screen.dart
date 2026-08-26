@@ -23,6 +23,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   bool _isLoading = false;
   bool _isBreakingDown = false;
   String? _errorMessage;
+  List<String> _milestones = [];
 
   final _jobService = JobService();
 
@@ -68,6 +69,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         _descriptionController.text = data['description'] ?? '';
         final skills = (data['skillsRequired'] as List?)?.cast<String>() ?? [];
         _skillsController.text = skills.join(', ');
+        _milestones = (data['milestones'] as List?)?.cast<String>() ?? [];
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('AI filled in the form below — review and adjust as needed!')),
@@ -103,6 +105,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       skillsRequired: skills,
       priority: _priority,
       deadline: _deadline!.toIso8601String(),
+      milestones: _milestones.isNotEmpty ? _milestones : null,
     );
 
     if (!mounted) return;
@@ -188,6 +191,25 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 ],
               ),
             ),
+            if (_milestones.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Text('AI-Generated Milestones', style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              ...List.generate(_milestones.length, (i) => Card(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: AppTheme.primary.withAlpha(25),
+                    child: Text('${i + 1}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                  ),
+                  title: Text(_milestones[i], style: const TextStyle(fontSize: 14)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.close, size: 18),
+                    onPressed: () => setState(() => _milestones.removeAt(i)),
+                  ),
+                ),
+              )),
+            ],
             const SizedBox(height: 24),
             const Text('Project Title', style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),

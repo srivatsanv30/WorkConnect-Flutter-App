@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../core/app_theme.dart';
 import '../notification/fcm_service.dart';
 import '../shell/main_shell.dart';
@@ -26,6 +26,9 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   String? _infoMessage;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
+  final _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
@@ -33,6 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _skillsController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -273,7 +277,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                 controller: _passwordController,
                                 icon: Icons.lock_outline,
                                 hint: 'Password',
-                                obscureText: true,
+                                obscureText: _obscurePassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: AppTheme.primary,
+                                    size: 20,
+                                  ),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                ),
                                 validator: (v) {
                                   if (v == null || v.isEmpty) return 'Password is required';
                                   if (_mode == _AuthMode.signUp && v.length < 6) {
@@ -285,6 +297,26 @@ class _AuthScreenState extends State<AuthScreen> {
                             ],
 
                             if (_mode == _AuthMode.signUp) ...[
+                              const SizedBox(height: 14),
+                              _RoundedField(
+                                controller: _confirmPasswordController,
+                                icon: Icons.lock_outline,
+                                hint: 'Confirm Password',
+                                obscureText: _obscureConfirm,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                                    color: AppTheme.primary,
+                                    size: 20,
+                                  ),
+                                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) return 'Please confirm your password';
+                                  if (v != _passwordController.text) return 'Passwords do not match';
+                                  return null;
+                                },
+                              ),
                               const SizedBox(height: 14),
                               _RoundedField(
                                 controller: _skillsController,
@@ -474,6 +506,7 @@ class _RoundedField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
+  final Widget? suffixIcon;
 
   const _RoundedField({
     required this.controller,
@@ -482,6 +515,7 @@ class _RoundedField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.validator,
+    this.suffixIcon,
   });
 
   @override
@@ -493,6 +527,7 @@ class _RoundedField extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, size: 22, color: AppTheme.primary),
+        suffixIcon: suffixIcon,
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black38, fontSize: 14),
         filled: true,

@@ -30,6 +30,43 @@ router.put('/me', requireAuth, async (req, res) => {
   res.json({ user });
 });
 
+// GET /api/users/:id/reputation
+router.get('/:id/reputation', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const Job = require('../models/Job');
+    const completedJobs = await Job.find({
+      assignedTo: userId,
+      status: 'Completed'
+    }).populate('creator', 'name email');
+
+    const jobsWithRating = completedJobs.filter(j => j.rating !== undefined && j.rating !== null);
+    const ratingCount = jobsWithRating.length;
+    const ratingSum = jobsWithRating.reduce((sum, j) => sum + j.rating, 0);
+    const ratingAverage = ratingCount > 0 ? Number((ratingSum / ratingCount).toFixed(1)) : 0.0;
+    const trustScore = (completedJobs.length * 10) + Math.round(ratingAverage * 5);
+
+    const reviews = jobsWithRating.map(j => ({
+      jobId: j._id,
+      jobTitle: j.title,
+      rating: j.rating,
+      reviewText: j.reviewText || '',
+      reviewerName: j.creator ? j.creator.name : 'Unknown Creator',
+      completedAt: j.completedAt || j.updatedAt
+    }));
+
+    res.json({
+      completedCount: completedJobs.length,
+      ratingAverage,
+      ratingCount,
+      trustScore,
+      reviews
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch reputation', error: err.message });
+  }
+});
+
 module.exports = router;
 // TEMPORARY DEBUG ROUTE — remove after testing
 router.get('/debug/all', async (req, res) => {

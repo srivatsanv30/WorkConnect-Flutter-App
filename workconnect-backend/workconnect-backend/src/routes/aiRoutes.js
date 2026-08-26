@@ -13,7 +13,7 @@ router.post('/breakdown', requireAuth, async (req, res) => {
       return res.status(400).json({ message: 'idea is required' });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
     const prompt = `You are a project planning assistant. A user wants to build: "${idea}".
 

@@ -27,8 +27,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/jobs', messageRoutes);
-app.use('/api/notifications', notificationRoutes);
 app.use('/api/tracking', trackingRoutes);
+app.use('/api/jobs', trackingRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/ai', aiRoutes);
 const PORT = process.env.PORT || 5000;
 

@@ -141,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.emoji_events_outlined,
                 label: 'Reputation & Ratings',
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReputationRatingsScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReputationRatingsScreen(userId: user?.id)));
                 },
               ),
               _MenuRow(

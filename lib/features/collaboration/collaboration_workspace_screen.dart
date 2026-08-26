@@ -55,11 +55,6 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Collaboration Workspace',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
             if (_isLoading)
               const Expanded(child: Center(child: CircularProgressIndicator()))
             else if (_activeProjects.isEmpty)
@@ -90,7 +85,7 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                     final job = _activeProjects[index];
                     final title = job['title'] ?? 'Untitled Project';
                     final jobId = job['_id']?.toString() ?? '';
-                    final creatorName = (job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown';
+                    final collaboratorName = (job['assignedTo'] is Map) ? job['assignedTo']['name'] ?? 'Unassigned' : 'Unassigned';
                     
                     return Card(
                       child: InkWell(
@@ -131,7 +126,7 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Creator: $creatorName',
+                                      'Collaborator: $collaboratorName',
                                       style: const TextStyle(color: Colors.black54, fontSize: 13),
                                     ),
                                   ],

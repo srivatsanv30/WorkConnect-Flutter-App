@@ -25,6 +25,10 @@ const jobSchema = new mongoose.Schema(
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    rating: { type: Number, default: null },
+    reviewText: { type: String, default: null },
+    completedAt: { type: Date, default: null },
+    reviewComments: { type: [String], default: [] },
   },
   { timestamps: true }
 );

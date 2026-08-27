@@ -7,7 +7,7 @@ const router = express.Router();
 // POST /api/jobs  (create a job — requires login)
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const { title, description, skillsRequired, priority, deadline } = req.body;
+    const { title, description, skillsRequired, priority, deadline, milestones } = req.body;
 
     if (!title || !description || !deadline) {
       return res.status(400).json({ message: 'title, description, and deadline are required' });
@@ -20,6 +20,7 @@ router.post('/', requireAuth, async (req, res) => {
       priority: priority || 'Medium',
       deadline: new Date(deadline),
       creator: req.userId,
+      milestones: Array.isArray(milestones) ? milestones.map(m => typeof m === 'string' ? { title: m, done: false } : m) : [],
     });
 
     const populated = await job.populate('creator', 'name email');
@@ -56,7 +57,9 @@ router.get('/', async (req, res) => {
     const query = hiddenJobIds.length > 0 ? { _id: { $nin: hiddenJobIds } } : {};
     const jobs = await Job.find(query)
       .sort({ createdAt: -1 })
-      .populate('creator', 'name email');
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email')
+      .populate('applicants', 'name email skills');
     res.json({ jobs });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch jobs', error: err.message });
@@ -91,7 +94,28 @@ router.post('/:id/apply', requireAuth, async (req, res) => {
     job.applicants.push(req.userId);
     await job.save();
 
-    res.json({ message: 'Applied successfully', job });
+    const populated = await Job.findById(job._id)
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email')
+      .populate('applicants', 'name email skills');
+
+    // Notify project creator
+    try {
+      const User = require('../models/User');
+      const { sendNotificationToUser } = require('../utils/sendNotification');
+      const applicant = await User.findById(req.userId);
+      const applicantName = applicant ? applicant.name : 'Someone';
+      await sendNotificationToUser({
+        userId: populated.creator._id,
+        title: 'New Collaboration Request',
+        body: `Your "${populated.title}" project has an invitation request from ${applicantName}.`,
+        jobId: populated._id,
+      });
+    } catch (notifErr) {
+      console.error('Failed to send application notification:', notifErr.message);
+    }
+
+    res.json({ message: 'Applied successfully', job: populated });
   } catch (err) {
     res.status(500).json({ message: 'Failed to apply', error: err.message });
   }
@@ -114,7 +138,10 @@ router.patch('/:id/assign', requireAuth, async (req, res) => {
     job.status = 'Accepted';
     await job.save();
 
-    const populated = await job.populate('creator assignedTo', 'name email');
+    const populated = await Job.findById(job._id)
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email')
+      .populate('applicants', 'name email skills');
     res.json({ job: populated });
   } catch (err) {
     res.status(500).json({ message: 'Failed to assign job', error: err.message });

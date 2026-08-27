@@ -20,6 +20,7 @@ class JobService {
     required List<String> skillsRequired,
     required String priority,
     required String deadline, // ISO date string e.g. 2026-08-15
+    List<String>? milestones,
   }) async {
     final token = await AuthService().getToken();
     if (token == null) {
@@ -39,6 +40,7 @@ class JobService {
           'skillsRequired': skillsRequired,
           'priority': priority,
           'deadline': deadline,
+          if (milestones != null) 'milestones': milestones,
         }),
       );
 
@@ -148,6 +150,76 @@ class JobService {
       }
     } catch (e) {
       return JobResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<JobResult> completeReview(String jobId, int rating, String reviewText) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return JobResult(success: false, errorMessage: 'You must be logged in.');
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/complete-review'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'rating': rating, 'reviewText': reviewText}),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        return JobResult(success: true, job: data['job']);
+      } else {
+        return JobResult(success: false, errorMessage: data['message'] ?? 'Failed to complete');
+      }
+    } catch (e) {
+      return JobResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<JobResult> reviewFeedback(String jobId, String action, String feedback) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return JobResult(success: false, errorMessage: 'You must be logged in.');
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/review-feedback'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'action': action, 'feedback': feedback}),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        return JobResult(success: true, job: data['job']);
+      } else {
+        return JobResult(success: false, errorMessage: data['message'] ?? 'Failed to process review');
+      }
+    } catch (e) {
+      return JobResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> fetchReputation(String userId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/users/$userId/reputation'),
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+      return {};
+    } catch (_) {
+      return {};
     }
   }
 }

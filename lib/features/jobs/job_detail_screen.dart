@@ -4,6 +4,8 @@ import 'job_service.dart';
 import '../collaboration/job_chat_screen.dart';
 import '../auth/user_model.dart';
 import '../profile/public_profile_screen.dart';
+import '../tracking/progress_tracker_screen.dart';
+import '../tracking/tracking_service.dart';
 
 class JobDetailScreen extends StatefulWidget {
   final Map<String, dynamic> job;
@@ -20,6 +22,29 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   String? _statusMessage;
   bool _statusIsError = false;
   bool _isAssigning = false;
+  final _trackingService = TrackingService();
+  bool _isUpdatingStatus = false;
+
+  Future<void> _updateStatus(String newStatus) async {
+    final jobId = widget.job['_id'];
+    if (jobId == null) return;
+    setState(() => _isUpdatingStatus = true);
+    final result = await _trackingService.updateStatus(jobId, newStatus);
+    if (!mounted) return;
+    setState(() => _isUpdatingStatus = false);
+    if (result.success && result.job != null) {
+      setState(() {
+        widget.job.addAll(result.job!);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.errorMessage ?? 'Failed to update status')),
+      );
+    }
+  }
 
   Future<void> _handleApply() async {
     final jobId = widget.job['_id'];
@@ -42,7 +67,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     });
   }
 
-  Widget _buildProgressTimeline() {
+  Widget _buildProgressTimeline(String status, bool isCreator, bool isAssignee, bool hasAssignee) {
+    final statusIndex = ['Pending', 'Accepted', 'In Progress', 'Review', 'Completed'].indexOf(status);
+    final activeColor = AppTheme.primary;
+    final inactiveColor = Colors.grey.shade300;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -61,16 +90,36 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildStep(Icons.check_circle, 'Assigned', true),
-              Expanded(child: Container(height: 2, color: AppTheme.primary)),
-              _buildStep(Icons.play_circle_fill, 'In Progress', true),
-              Expanded(child: Container(height: 2, color: Colors.grey.shade300)),
-              _buildStep(Icons.rate_review, 'Review', false),
-              Expanded(child: Container(height: 2, color: Colors.grey.shade300)),
-              _buildStep(Icons.done_all, 'Completed', false),
+              _buildStep(Icons.check_circle, 'Assigned', statusIndex >= 1),
+              Expanded(child: Container(height: 2, color: statusIndex >= 2 ? activeColor : inactiveColor)),
+              _buildStep(Icons.play_circle_fill, 'In Progress', statusIndex >= 2),
+              Expanded(child: Container(height: 2, color: statusIndex >= 3 ? activeColor : inactiveColor)),
+              _buildStep(Icons.rate_review, 'Review', statusIndex >= 3),
+              Expanded(child: Container(height: 2, color: statusIndex >= 4 ? activeColor : inactiveColor)),
+              _buildStep(Icons.done_all, 'Completed', statusIndex >= 4),
             ],
           ),
         ),
+        if (hasAssignee && (isCreator || isAssignee) && status != 'Completed') ...[
+          const SizedBox(height: 16),
+          const Text('Update Project Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.black54)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              ChoiceChip(
+                label: const Text('In Progress'),
+                selected: status == 'In Progress',
+                onSelected: _isUpdatingStatus ? null : (_) => _updateStatus('In Progress'),
+              ),
+              const SizedBox(width: 8),
+              ChoiceChip(
+                label: const Text('Submit for Review'),
+                selected: status == 'Review',
+                onSelected: _isUpdatingStatus ? null : (_) => _updateStatus('Review'),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -82,6 +131,114 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         const SizedBox(height: 8),
         Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isActive ? AppTheme.primary : Colors.grey)),
       ],
+    );
+  }
+
+  void _showFeedbackDialog(String jobId, String action) {
+    final feedbackController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(action == 'request_changes' ? 'Request Changes' : 'Approve Work'),
+        content: TextField(
+          controller: feedbackController,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            hintText: 'Add feedback or comments...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final result = await _jobService.reviewFeedback(jobId, action, feedbackController.text.trim());
+              if (!mounted) return;
+              if (result.success && result.job != null) {
+                setState(() {
+                  widget.job.addAll(result.job!);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(action == 'request_changes' ? 'Changes requested' : 'Work approved')),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(result.errorMessage ?? 'Failed')),
+                );
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCompleteDialog(String jobId) {
+    int selectedRating = 5;
+    final reviewController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Mark Project as Completed'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Rate the collaborator:', style: TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (i) => IconButton(
+                    icon: Icon(
+                      i < selectedRating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                      size: 32,
+                    ),
+                    onPressed: () => setDialogState(() => selectedRating = i + 1),
+                  )),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: reviewController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: 'Write a review for the collaborator...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1DBF73)),
+              onPressed: () async {
+                Navigator.pop(ctx);
+                final result = await _jobService.completeReview(jobId, selectedRating, reviewController.text.trim());
+                if (!mounted) return;
+                if (result.success && result.job != null) {
+                  setState(() {
+                    widget.job.addAll(result.job!);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Project marked as completed!')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(result.errorMessage ?? 'Failed to complete')),
+                  );
+                }
+              },
+              child: const Text('Complete & Rate'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -194,7 +351,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (hasAssignee && (isCreator || isAssignee)) ...[
-                    _buildProgressTimeline(),
+                    _buildProgressTimeline(status, isCreator, isAssignee, hasAssignee),
                     const SizedBox(height: 32),
                   ],
 
@@ -366,29 +523,157 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
                   // Creator or assignee, once assigned: show chat entry
                   if (hasAssignee && (isCreator || isAssignee)) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => JobChatScreen(
-                                jobId: jobId,
-                                jobTitle: title,
-                                currentUserId: widget.currentUserId,
-                              ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => JobChatScreen(
+                                    jobId: jobId,
+                                    jobTitle: title,
+                                    currentUserId: widget.currentUserId,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                            label: const Text('Chat', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                        label: const Text('Open Project Chat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ProgressTrackerScreen(job: job),
+                                ),
+                              ).then((_) {
+                                // Refresh job status/details when returning from progress tracker
+                                // Just a refresh block if needed
+                              });
+                            },
+                            icon: const Icon(Icons.track_changes, size: 18),
+                            label: const Text('Track Progress', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppTheme.primary,
+                              side: const BorderSide(color: AppTheme.primary),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 32),
+                  ],
+
+                  // Creator-only: Review Work and Mark Complete controls
+                  if (isCreator && hasAssignee && status == 'Review') ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF8E1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.orange.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.rate_review, color: Colors.orange, size: 22),
+                              SizedBox(width: 8),
+                              Text('Review Submitted Work', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Text('The collaborator has submitted work for your review. You can request changes or approve and complete the project.', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _showFeedbackDialog(jobId, 'request_changes'),
+                                  icon: const Icon(Icons.replay, size: 18),
+                                  label: const Text('Request Changes'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.orange.shade700,
+                                    side: BorderSide(color: Colors.orange.shade300),
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _showCompleteDialog(jobId),
+                                  icon: const Icon(Icons.check_circle_outline, size: 18),
+                                  label: const Text('Mark Completed'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF1DBF73),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Creator-only: completed status info
+                  if (status == 'Completed') ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE4F9EE),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.green.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.check_circle, color: Color(0xFF1DBF73), size: 22),
+                              SizedBox(width: 8),
+                              Text('Project Completed', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1DBF73))),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          if (job['rating'] != null)
+                            Row(
+                              children: [
+                                ...List.generate(5, (i) => Icon(
+                                  i < (job['rating'] as num).toInt() ? Icons.star : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 20,
+                                )),
+                                const SizedBox(width: 8),
+                                Text('${job['rating']}/5', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          if (job['reviewText'] != null && (job['reviewText'] as String).isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text('"${job['reviewText']}"', style: const TextStyle(color: Colors.black54, fontStyle: FontStyle.italic, fontSize: 13)),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
 
                   // Applicant view (not creator, not yet assigned): apply button

@@ -43,4 +43,19 @@ class NotificationService {
       return [];
     }
   }
+
+  Future<bool> markAsRead(String id) async {
+    final authToken = await AuthService().getToken();
+    if (authToken == null) return false;
+
+    try {
+      final response = await http.patch(
+        Uri.parse('${AppConstants.baseUrl}/notifications/$id/read'),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
 }

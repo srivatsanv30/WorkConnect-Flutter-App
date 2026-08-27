@@ -72,7 +72,7 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Workspace Hub',
+                        'Hub',
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
@@ -125,11 +125,11 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                   label: 'TASKS COMPLETED',
                   sublabel: 'Milestones completed',
                 ),
-                const StatCard(
+                StatCard(
                   icon: Icons.people_outline,
-                  iconColor: Color(0xFFE0A800),
-                  iconBg: Color(0xFFFFF6E0),
-                  value: '0',
+                  iconColor: const Color(0xFFE0A800),
+                  iconBg: const Color(0xFFFFF6E0),
+                  value: '${_jobs.where((job) => job['assignedTo'] != null).map((job) => (job['assignedTo'] is Map) ? job['assignedTo']['_id']?.toString() : job['assignedTo']?.toString()).where((id) => id != null).toSet().length}',
                   label: 'COLLABORATORS',
                   sublabel: 'Active partners',
                 ),
@@ -218,6 +218,15 @@ class _JobCard extends StatelessWidget {
     final skills = ((job['skillsRequired'] as List?) ?? []).cast<String>();
     final priority = job['priority'] ?? 'Medium';
     final creatorName = (job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown';
+    final createdAtRaw = job['createdAt'];
+    
+    String createdDateText = '';
+    if (createdAtRaw != null) {
+      final date = DateTime.tryParse(createdAtRaw.toString());
+      if (date != null) {
+        createdDateText = '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
+      }
+    }
 
     return Card(
       child: Padding(
@@ -271,6 +280,12 @@ class _JobCard extends StatelessWidget {
                 const Icon(Icons.person_outline, size: 14, color: Colors.black38),
                 const SizedBox(width: 4),
                 Text('Posted by $creatorName', style: const TextStyle(fontSize: 11, color: Colors.black38)),
+                if (createdDateText.isNotEmpty) ...[
+                  const Spacer(),
+                  const Icon(Icons.calendar_today, size: 12, color: Colors.black38),
+                  const SizedBox(width: 4),
+                  Text('Created: $createdDateText', style: const TextStyle(fontSize: 11, color: Colors.black38)),
+                ],
               ],
             ),
           ],

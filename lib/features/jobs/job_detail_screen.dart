@@ -331,6 +331,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                     onPressed: _isAssigning
                                         ? null
                                         : () async {
+                                            final messenger = ScaffoldMessenger.of(context);
                                             setState(() => _isAssigning = true);
                                             final result = await _jobService.assignApplicant(jobId, id ?? '');
                                             if (!mounted) return;
@@ -341,7 +342,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                                 widget.job['status'] = 'Accepted';
                                               });
                                             } else {
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              messenger.showSnackBar(
                                                 SnackBar(content: Text(result.errorMessage ?? 'Failed to assign')),
                                               );
                                             }

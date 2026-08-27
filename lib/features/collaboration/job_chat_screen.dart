@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/app_theme.dart';
-import '../auth/auth_service.dart';
 import 'chat_service.dart';
 import 'message_service.dart';
 

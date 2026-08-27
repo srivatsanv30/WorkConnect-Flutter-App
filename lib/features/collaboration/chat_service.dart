@@ -1,9 +1,9 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../../core/constants.dart';
 import '../auth/auth_service.dart';
 
 class ChatService {
-  IO.Socket? _socket;
+  io.Socket? _socket;
 
   Future<void> connect({
     required String jobId,
@@ -15,9 +15,9 @@ class ChatService {
     // constants.dart has http://localhost:5000/api — strip the /api for socket base URL
     final baseUrl = AppConstants.baseUrl.replaceAll('/api', '');
 
-    _socket = IO.io(
+    _socket = io.io(
       baseUrl,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .setAuth({'token': token})
           .disableAutoConnect()

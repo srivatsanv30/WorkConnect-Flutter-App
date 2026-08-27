@@ -9,3 +9,4 @@ build/
 ios/Pods/
 android/.gradle/
 src/config/serviceAccountKey.json
+.env.example

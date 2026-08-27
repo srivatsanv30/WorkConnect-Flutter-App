@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'post_job_screen.dart';
 
 /// Job Posting Module entry point.
 /// Will later pull from GET /api/jobs with skill-based filtering.
@@ -13,7 +14,14 @@ class JobListScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: navigate to create-job screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PostJobScreen(
+                onPosted: () => Navigator.pop(context),
+              ),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),

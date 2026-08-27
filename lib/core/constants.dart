@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 ///   - Chrome / web            -> http://localhost:5000/api   (use this one)
 ///   - Android emulator        -> http://10.0.2.2:5000/api
 ///   - iOS simulator           -> http://localhost:5000/api
-///   - Physical phone          -> http://<your-computer-LAN-IP>:5000/api
+///   - Physical phone          -> http://`your-computer-LAN-IP`:5000/api
 class AppConstants {
   AppConstants._();
 

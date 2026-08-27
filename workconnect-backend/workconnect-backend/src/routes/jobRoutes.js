@@ -37,7 +37,24 @@ router.post('/', requireAuth, async (req, res) => {
 // GET /api/jobs  (list all jobs, newest first — public, no login required)
 router.get('/', async (req, res) => {
   try {
-    const jobs = await Job.find()
+    let hiddenJobIds = [];
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = require('jsonwebtoken').verify(token, process.env.JWT_SECRET);
+        const User = require('../models/User');
+        const user = await User.findById(decoded.userId);
+        if (user && user.hiddenJobs) {
+          hiddenJobIds = user.hiddenJobs;
+        }
+      } catch (err) {
+        // ignore invalid token
+      }
+    }
+
+    const query = hiddenJobIds.length > 0 ? { _id: { $nin: hiddenJobIds } } : {};
+    const jobs = await Job.find(query)
       .sort({ createdAt: -1 })
       .populate('creator', 'name email');
     res.json({ jobs });
@@ -101,6 +118,45 @@ router.patch('/:id/assign', requireAuth, async (req, res) => {
     res.json({ job: populated });
   } catch (err) {
     res.status(500).json({ message: 'Failed to assign job', error: err.message });
+  }
+});
+
+// DELETE /api/jobs/:id (creator deletes their job)
+router.delete('/:id', requireAuth, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    
+    if (job.creator.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the creator can delete this job' });
+    }
+    
+    await Job.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Job deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete job', error: err.message });
+  }
+});
+
+// POST /api/jobs/:id/hide (user hides a job from their feed)
+router.post('/:id/hide', requireAuth, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!user.hiddenJobs) {
+      user.hiddenJobs = [];
+    }
+
+    if (!user.hiddenJobs.includes(req.params.id)) {
+      user.hiddenJobs.push(req.params.id);
+      await user.save();
+    }
+
+    res.json({ message: 'Job hidden successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to hide job', error: err.message });
   }
 });
 

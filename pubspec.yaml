@@ -21,6 +21,9 @@ dependencies:
   # Local token storage
   shared_preferences: ^2.2.3
 
+  # Image picker
+  image_picker: ^1.1.2
+
   # Push notifications
   firebase_core: ^4.13.0
   firebase_messaging: ^16.5.0

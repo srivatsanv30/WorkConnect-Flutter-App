@@ -242,6 +242,61 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Job?'),
+        content: const Text('This action will permanently delete this job and its associated data. Are you sure you want to continue?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final result = await _jobService.deleteJob(widget.job['_id']);
+              if (!mounted) return;
+              if (result.success) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Job deleted successfully')));
+                Navigator.pop(context); // Go back to jobs list
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.errorMessage ?? 'Failed to delete job')));
+              }
+            },
+            child: const Text('Delete Job', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showHideDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hide Job?'),
+        content: const Text('This job will be hidden from your view.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final result = await _jobService.hideJob(widget.job['_id']);
+              if (!mounted) return;
+              if (result.success) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Job hidden successfully')));
+                Navigator.pop(context); // Go back to jobs list
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.errorMessage ?? 'Failed to hide job')));
+              }
+            },
+            child: const Text('Hide Job'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final job = widget.job;
@@ -274,6 +329,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         title: const Text('Project Details'),
         elevation: 0,
         backgroundColor: Colors.transparent,
+        actions: [
+          if (isCreator)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.white),
+              onPressed: _showDeleteDialog,
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.visibility_off_outlined, color: Colors.white),
+              onPressed: _showHideDialog,
+            ),
+        ],
       ),
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(

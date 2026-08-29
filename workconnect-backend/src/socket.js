@@ -29,8 +29,8 @@ function setupSocket(io) {
       socket.join(jobId);
     });
 
-    socket.on('send_message', async ({ jobId, text }) => {
-      if (!text || !text.trim()) return;
+    socket.on('send_message', async ({ jobId, text, imageUrl }) => {
+      if ((!text || !text.trim()) && !imageUrl) return;
 
       const job = await Job.findById(jobId);
       if (!job) return;
@@ -42,7 +42,8 @@ function setupSocket(io) {
       const message = await Message.create({
         job: jobId,
         sender: socket.userId,
-        text: text.trim(),
+        text: text ? text.trim() : '',
+        imageUrl: imageUrl || null,
       });
 
       const populated = await message.populate('sender', 'name');

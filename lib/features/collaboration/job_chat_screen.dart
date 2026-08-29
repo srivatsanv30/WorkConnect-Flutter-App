@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/app_theme.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
 import 'chat_service.dart';
 import 'message_service.dart';
 
@@ -24,8 +27,10 @@ class _JobChatScreenState extends State<JobChatScreen> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
 
-List<Map<String, dynamic>> _messages = [];
+  List<Map<String, dynamic>> _messages = [];
   bool _isLoading = true;
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
   @override
   void initState() {
     super.initState();
@@ -65,11 +70,63 @@ List<Map<String, dynamic>> _messages = [];
     });
   }
 
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImage = File(image.path);
+      });
+    }
+  }
+
+  void _clearImage() {
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
   void _handleSend() {
     final text = _textController.text.trim();
-    if (text.isEmpty) return;
-    _chatService.sendMessage(widget.jobId, text);
+    if (text.isEmpty && _selectedImage == null) return;
+    
+    String? base64Image;
+    if (_selectedImage != null) {
+      final bytes = _selectedImage!.readAsBytesSync();
+      base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+    }
+
+    _chatService.sendMessage(widget.jobId, text, imageUrl: base64Image);
     _textController.clear();
+    _clearImage();
+  }
+
+  void _showSettings() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Workspace Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.notifications_off_outlined),
+                title: const Text('Mute Notifications'),
+                trailing: Switch(value: false, onChanged: (val) {}),
+              ),
+              ListTile(
+                leading: const Icon(Icons.folder_shared_outlined),
+                title: const Text('Shared Files'),
+                onTap: () => Navigator.pop(ctx),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -83,7 +140,15 @@ List<Map<String, dynamic>> _messages = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.jobTitle, overflow: TextOverflow.ellipsis)),
+      appBar: AppBar(
+        title: Text(widget.jobTitle, overflow: TextOverflow.ellipsis),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: _showSettings,
+          )
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -113,17 +178,52 @@ List<Map<String, dynamic>> _messages = [];
 
                           return _ChatBubble(
                             text: msg['text'] ?? '',
+                            imageUrl: msg['imageUrl'],
                             senderName: senderName,
                             isMe: isMe,
                           );
                         },
                       ),
           ),
+          if (_selectedImage != null)
+            Container(
+              padding: const EdgeInsets.all(8),
+              color: Colors.grey.shade200,
+              child: Row(
+                children: [
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(_selectedImage!, height: 60, width: 60, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: GestureDetector(
+                          onTap: _clearImage,
+                          child: Container(
+                            color: Colors.black54,
+                            child: const Icon(Icons.close, color: Colors.white, size: 16),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(child: Text('Image attached', style: TextStyle(fontWeight: FontWeight.bold))),
+                ],
+              ),
+            ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(Icons.image_outlined, color: AppTheme.primary),
+                    onPressed: _pickImage,
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _textController,
@@ -136,7 +236,7 @@ List<Map<String, dynamic>> _messages = [];
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: AppTheme.logoGradient,
                       shape: BoxShape.circle,
                     ),
@@ -157,10 +257,11 @@ List<Map<String, dynamic>> _messages = [];
 
 class _ChatBubble extends StatelessWidget {
   final String text;
+  final String? imageUrl;
   final String senderName;
   final bool isMe;
 
-  const _ChatBubble({required this.text, required this.senderName, required this.isMe});
+  const _ChatBubble({required this.text, this.imageUrl, required this.senderName, required this.isMe});
 
   @override
   Widget build(BuildContext context) {
@@ -189,10 +290,23 @@ class _ChatBubble extends StatelessWidget {
                   ),
                 ),
               ),
-            Text(
-              text,
-              style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 14),
-            ),
+            if (imageUrl != null && imageUrl!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(
+                    base64Decode(imageUrl!.split(',').last),
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, color: Colors.grey),
+                  ),
+                ),
+              ),
+            if (text.isNotEmpty)
+              Text(
+                text,
+                style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 14),
+              ),
           ],
         ),
       ),

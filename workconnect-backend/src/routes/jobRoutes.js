@@ -187,4 +187,55 @@ router.post('/:id/hide', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/jobs/:id/complete
+router.post('/:id/complete', requireAuth, async (req, res) => {
+  try {
+    const { rating, reviewText } = req.body;
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    
+    if (job.creator.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the creator can mark this job as complete' });
+    }
+    
+    if (job.status === 'Completed') {
+      return res.status(400).json({ message: 'Job is already completed' });
+    }
+    
+    job.status = 'Completed';
+    job.completedAt = new Date();
+    
+    if (rating) {
+      job.rating = rating;
+      if (reviewText) job.reviewText = reviewText;
+      
+      if (job.assignedTo) {
+        const User = require('../models/User');
+        const assignee = await User.findById(job.assignedTo);
+        if (assignee) {
+          assignee.projectsCompleted = (assignee.projectsCompleted || 0) + 1;
+          
+          // Calculate XP (e.g., 50 base XP + 10 * rating)
+          assignee.xp = (assignee.xp || 0) + 50 + (rating * 10);
+          
+          // Update rating
+          const newCount = (assignee.ratingCount || 0) + 1;
+          const oldAverage = assignee.ratingAverage || 0;
+          const oldCount = assignee.ratingCount || 0;
+          
+          assignee.ratingAverage = ((oldAverage * oldCount) + rating) / newCount;
+          assignee.ratingCount = newCount;
+          
+          await assignee.save();
+        }
+      }
+    }
+    
+    await job.save();
+    res.json({ message: 'Job completed successfully', job });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to complete job', error: err.message });
+  }
+});
+
 module.exports = router;

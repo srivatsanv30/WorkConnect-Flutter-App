@@ -58,7 +58,16 @@ class JobService {
 
   Future<List<Map<String, dynamic>>> fetchJobs() async {
     try {
-      final response = await http.get(Uri.parse('${AppConstants.baseUrl}/jobs'));
+      final token = await AuthService().getToken();
+      final headers = <String, String>{};
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/jobs'),
+        headers: headers,
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final jobs = (data['jobs'] as List?) ?? [];
@@ -161,7 +170,7 @@ class JobService {
 
     try {
       final response = await http.post(
-        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/complete-review'),
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/complete'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -220,6 +229,58 @@ class JobService {
       return {};
     } catch (_) {
       return {};
+    }
+  }
+
+  Future<JobResult> deleteJob(String jobId) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return JobResult(success: false, errorMessage: 'You must be logged in.');
+    }
+
+    try {
+      final response = await http.delete(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        return JobResult(success: true);
+      } else {
+        return JobResult(success: false, errorMessage: data['message'] ?? 'Failed to delete job');
+      }
+    } catch (e) {
+      return JobResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<JobResult> hideJob(String jobId) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return JobResult(success: false, errorMessage: 'You must be logged in.');
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/hide'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        return JobResult(success: true);
+      } else {
+        return JobResult(success: false, errorMessage: data['message'] ?? 'Failed to hide job');
+      }
+    } catch (e) {
+      return JobResult(success: false, errorMessage: 'Could not reach server: $e');
     }
   }
 }

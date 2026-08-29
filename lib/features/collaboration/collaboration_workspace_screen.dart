@@ -124,10 +124,21 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Collaborator: $collaboratorName',
-                                      style: const TextStyle(color: Colors.black54, fontSize: 13),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                                          child: Text('Creator: ${(job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown'}', style: const TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold)),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                                          child: Text('Assignee: ${(job['assignedTo'] is Map) ? job['assignedTo']['name'] ?? 'Unknown' : 'Unknown'}', style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/app_theme.dart';
 
 class CustomizeExperienceScreen extends StatefulWidget {
@@ -14,6 +15,48 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
   bool _showAnimations = true;
   bool _accessibilityMode = false;
   String _language = 'English';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedTheme = prefs.getString('theme') ?? 'Light';
+      _compactView = prefs.getBool('compact_view') ?? false;
+      _showAnimations = prefs.getBool('show_animations') ?? true;
+      _accessibilityMode = prefs.getBool('accessibility_mode') ?? false;
+      _language = prefs.getString('language') ?? 'English';
+    });
+  }
+
+  Future<void> _savePreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('theme', _selectedTheme);
+    await prefs.setBool('compact_view', _compactView);
+    await prefs.setBool('show_animations', _showAnimations);
+    await prefs.setBool('accessibility_mode', _accessibilityMode);
+    await prefs.setString('language', _language);
+    
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            SizedBox(width: 10),
+            Text('Preferences saved!'),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1DBF73),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,22 +159,7 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
 
             // Save button
             ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Row(
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.white, size: 20),
-                        SizedBox(width: 10),
-                        Text('Preferences saved!'),
-                      ],
-                    ),
-                    backgroundColor: const Color(0xFF1DBF73),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                );
-              },
+              onPressed: _savePreferences,
               child: const Text('Save Preferences', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ],

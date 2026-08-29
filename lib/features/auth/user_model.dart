@@ -5,6 +5,10 @@ class AppUser {
   final List<String> skills;
   final String bio;
   final String availability;
+  final int xp;
+  final int projectsCompleted;
+  final double ratingAverage;
+  final int ratingCount;
 
   AppUser({
     required this.id,
@@ -13,6 +17,10 @@ class AppUser {
     required this.skills,
     required this.bio,
     required this.availability,
+    this.xp = 0,
+    this.projectsCompleted = 0,
+    this.ratingAverage = 0.0,
+    this.ratingCount = 0,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
@@ -23,6 +31,10 @@ class AppUser {
       skills: (json['skills'] as List?)?.map((e) => e.toString()).toList() ?? [],
       bio: json['bio'] ?? '',
       availability: json['availability'] ?? 'available',
+      xp: json['xp']?.toInt() ?? 0,
+      projectsCompleted: json['projectsCompleted']?.toInt() ?? 0,
+      ratingAverage: json['ratingAverage']?.toDouble() ?? 0.0,
+      ratingCount: json['ratingCount']?.toInt() ?? 0,
     );
   }
 }

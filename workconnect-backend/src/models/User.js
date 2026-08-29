@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema(
     fcmToken: { type: String, default: null },
     ratingAverage: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
+    xp: { type: Number, default: 0 },
+    projectsCompleted: { type: Number, default: 0 },
     hiddenJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
   },
   { timestamps: true }

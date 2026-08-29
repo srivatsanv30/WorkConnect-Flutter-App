@@ -47,6 +47,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     if (jobId != null && jobId.isNotEmpty) {
+      if (!mounted) return;
       // Fetch full job detail from backend
       showDialog(
         context: context,

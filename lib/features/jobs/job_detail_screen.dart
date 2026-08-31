@@ -75,16 +75,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Project Progress', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 16),
+        Text('Project Progress', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+              BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
             ],
           ),
           child: Row(
@@ -101,19 +101,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           ),
         ),
         if (hasAssignee && (isCreator || isAssignee) && status != 'Completed') ...[
-          const SizedBox(height: 16),
-          const Text('Update Project Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.black54)),
-          const SizedBox(height: 8),
+          SizedBox(height: 16),
+          Text('Update Project Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+          SizedBox(height: 8),
           Row(
             children: [
               ChoiceChip(
-                label: const Text('In Progress'),
+                label: Text('In Progress'),
                 selected: status == 'In Progress',
                 onSelected: _isUpdatingStatus ? null : (_) => _updateStatus('In Progress'),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('Submit for Review'),
+                label: Text('Submit for Review'),
                 selected: status == 'Review',
                 onSelected: _isUpdatingStatus ? null : (_) => _updateStatus('Review'),
               ),
@@ -128,7 +128,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Column(
       children: [
         Icon(icon, color: isActive ? AppTheme.primary : Colors.grey.shade300, size: 28),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isActive ? AppTheme.primary : Colors.grey)),
       ],
     );
@@ -149,7 +149,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
@@ -168,7 +168,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 );
               }
             },
-            child: const Text('Submit'),
+            child: Text('Submit'),
           ),
         ],
       ),
@@ -182,14 +182,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Mark Project as Completed'),
+          title: Text('Mark Project as Completed'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Rate the collaborator:', style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
+                Text('Rate the collaborator:', style: TextStyle(fontWeight: FontWeight.w600)),
+                SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (i) => IconButton(
@@ -201,7 +201,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     onPressed: () => setDialogState(() => selectedRating = i + 1),
                   )),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextField(
                   controller: reviewController,
                   maxLines: 3,
@@ -214,7 +214,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel')),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1DBF73)),
               onPressed: () async {
@@ -234,7 +234,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   );
                 }
               },
-              child: const Text('Complete & Rate'),
+              child: Text('Complete & Rate'),
             ),
           ],
         ),
@@ -246,10 +246,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Job?'),
-        content: const Text('This action will permanently delete this job and its associated data. Are you sure you want to continue?'),
+        title: Text('Delete Job?'),
+        content: Text('This action will permanently delete this job and its associated data. Are you sure you want to continue?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
@@ -263,7 +263,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.errorMessage ?? 'Failed to delete job')));
               }
             },
-            child: const Text('Delete Job', style: TextStyle(color: Colors.white)),
+            child: Text('Delete Job', style: TextStyle(color: Theme.of(context).cardColor)),
           ),
         ],
       ),
@@ -274,10 +274,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hide Job?'),
-        content: const Text('This job will be hidden from your view.'),
+        title: Text('Hide Job?'),
+        content: Text('This job will be hidden from your view.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
@@ -290,7 +290,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.errorMessage ?? 'Failed to hide job')));
               }
             },
-            child: const Text('Hide Job'),
+            child: Text('Hide Job'),
           ),
         ],
       ),
@@ -326,18 +326,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Project Details'),
+        title: Text('Project Details'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
           if (isCreator)
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.white),
+              icon: Icon(Icons.delete_outline, color: Theme.of(context).cardColor),
               onPressed: _showDeleteDialog,
             )
           else
             IconButton(
-              icon: const Icon(Icons.visibility_off_outlined, color: Colors.white),
+              icon: Icon(Icons.visibility_off_outlined, color: Theme.of(context).cardColor),
               onPressed: _showHideDialog,
             ),
         ],
@@ -374,38 +374,38 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                         child: Text(
                           priority.toUpperCase(),
-                          style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          style: TextStyle(fontSize: 11, color: Theme.of(context).cardColor, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           status.toUpperCase(),
-                          style: const TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, height: 1.2)),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 20),
+                  Text(title, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).cardColor, height: 1.2)),
+                  SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.person, size: 18, color: Colors.white70),
-                      const SizedBox(width: 6),
-                      Text('Posted by $creatorName', style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
+                      Icon(Icons.person, size: 18, color: Colors.white70),
+                      SizedBox(width: 6),
+                      Text('Posted by $creatorName', style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 18, color: Colors.white70),
-                      const SizedBox(width: 6),
-                      Text('Deadline: $deadlineText', style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
+                      Icon(Icons.calendar_today, size: 18, color: Colors.white70),
+                      SizedBox(width: 6),
+                      Text('Deadline: $deadlineText', style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ],
@@ -419,17 +419,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 children: [
                   if (hasAssignee && (isCreator || isAssignee)) ...[
                     _buildProgressTimeline(status, isCreator, isAssignee, hasAssignee),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                   ],
 
-                  const Text('Description', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 12),
-                  Text(description, style: const TextStyle(color: Colors.black87, height: 1.6, fontSize: 15)),
-                  const SizedBox(height: 32),
+                  Text('Description', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  SizedBox(height: 12),
+                  Text(description, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, height: 1.6, fontSize: 15)),
+                  SizedBox(height: 32),
                   
                   if (skills.isNotEmpty) ...[
-                    const Text('Required Skills', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    const SizedBox(height: 16),
+                    Text('Required Skills', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    SizedBox(height: 16),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
@@ -437,13 +437,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           .map((s) => Chip(
                                 label: Text(s),
                                 backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                                labelStyle: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
+                                labelStyle: TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.w600),
                                 side: BorderSide.none,
                                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                               ))
                           .toList(),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                   ],
 
                   if (_statusMessage != null) ...[
@@ -460,7 +460,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             _statusIsError ? Icons.error_outline : Icons.check_circle_outline,
                             color: _statusIsError ? Colors.red.shade700 : const Color(0xFF1DBF73),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               _statusMessage!,
@@ -474,13 +474,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                   ],
 
                   // Creator view: show applicants to assign
                   if (isCreator && !hasAssignee && applicants.isNotEmpty) ...[
-                    const Text('Applicants', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                    const SizedBox(height: 16),
+                    Text('Applicants', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    SizedBox(height: 16),
                     ...applicants.map((applicant) {
                       final name = (applicant is Map) ? applicant['name'] ?? 'Unknown' : 'Unknown';
                       final id = (applicant is Map) ? applicant['_id']?.toString() : applicant?.toString();
@@ -494,11 +494,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.grey.shade200),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                            BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
                           ],
                         ),
                         child: Column(
@@ -509,22 +509,22 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   radius: 24,
                                   backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
                                   foregroundColor: AppTheme.primary,
-                                  child: Text(initials, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                  child: Text(initials, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                                 ),
-                                const SizedBox(width: 16),
+                                SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                      const SizedBox(height: 4),
-                                      const Text('Wants to collaborate on this project', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                                      Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                      SizedBox(height: 4),
+                                      Text('Wants to collaborate on this project', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: 20),
                             Row(
                               children: [
                                 Expanded(
@@ -546,10 +546,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                       padding: const EdgeInsets.symmetric(vertical: 12),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
-                                    child: const Text('View Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    child: Text('View Profile', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(width: 12),
                                 Expanded(
                                   child: ElevatedButton(
                                     onPressed: _isAssigning
@@ -576,7 +576,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                     ),
-                                    child: const Text('Assign Task', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    child: Text('Assign Task', style: TextStyle(fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ],
@@ -585,7 +585,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                       );
                     }),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                   ],
 
                   // Creator or assignee, once assigned: show chat entry
@@ -605,15 +605,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                            label: const Text('Chat', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            icon: Icon(Icons.chat_bubble_outline, size: 18),
+                            label: Text('Chat', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () {
@@ -626,8 +626,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 // Just a refresh block if needed
                               });
                             },
-                            icon: const Icon(Icons.track_changes, size: 18),
-                            label: const Text('Track Progress', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            icon: Icon(Icons.track_changes, size: 18),
+                            label: Text('Track Progress', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppTheme.primary,
                               side: const BorderSide(color: AppTheme.primary),
@@ -638,7 +638,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                   ],
 
                   // Creator-only: Review Work and Mark Complete controls
@@ -653,23 +653,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(Icons.rate_review, color: Colors.orange, size: 22),
                               SizedBox(width: 8),
                               Text('Review Submitted Work', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          const Text('The collaborator has submitted work for your review. You can request changes or approve and complete the project.', style: TextStyle(color: Colors.black54, fontSize: 13)),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 12),
+                          Text('The collaborator has submitted work for your review. You can request changes or approve and complete the project.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                          SizedBox(height: 16),
                           Row(
                             children: [
                               Expanded(
                                 child: OutlinedButton.icon(
                                   onPressed: () => _showFeedbackDialog(jobId, 'request_changes'),
-                                  icon: const Icon(Icons.replay, size: 18),
-                                  label: const Text('Request Changes'),
+                                  icon: Icon(Icons.replay, size: 18),
+                                  label: Text('Request Changes'),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.orange.shade700,
                                     side: BorderSide(color: Colors.orange.shade300),
@@ -678,12 +678,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () => _showCompleteDialog(jobId),
-                                  icon: const Icon(Icons.check_circle_outline, size: 18),
-                                  label: const Text('Mark Completed'),
+                                  icon: Icon(Icons.check_circle_outline, size: 18),
+                                  label: Text('Mark Completed'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF1DBF73),
                                     foregroundColor: Colors.white,
@@ -698,7 +698,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                   ],
 
                   // Creator-only: completed status info
@@ -713,14 +713,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(Icons.check_circle, color: Color(0xFF1DBF73), size: 22),
                               SizedBox(width: 8),
                               Text('Project Completed', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1DBF73))),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           if (job['rating'] != null)
                             Row(
                               children: [
@@ -729,18 +729,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   color: Colors.amber,
                                   size: 20,
                                 )),
-                                const SizedBox(width: 8),
-                                Text('${job['rating']}/5', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                SizedBox(width: 8),
+                                Text('${job['rating']}/5', style: TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           if (job['reviewText'] != null && (job['reviewText'] as String).isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Text('"${job['reviewText']}"', style: const TextStyle(color: Colors.black54, fontStyle: FontStyle.italic, fontSize: 13)),
+                            SizedBox(height: 8),
+                            Text('"${job['reviewText']}"', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontStyle: FontStyle.italic, fontSize: 13)),
                           ],
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                   ],
 
                   // Applicant view (not creator, not yet assigned): apply button
@@ -750,14 +750,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       child: ElevatedButton.icon(
                         onPressed: _isApplying ? null : _handleApply,
                         icon: _isApplying
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
                               )
-                            : const Icon(Icons.send_outlined, size: 20),
+                            : Icon(Icons.send_outlined, size: 20),
                         label: Text(_isApplying ? 'Sending Application...' : 'Apply for this Project', 
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

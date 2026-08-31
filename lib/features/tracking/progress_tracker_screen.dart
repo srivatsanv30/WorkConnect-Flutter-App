@@ -97,14 +97,14 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            const SizedBox(height: 12),
+            Text('Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            SizedBox(height: 12),
             SizedBox(
               height: 40,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _statuses.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, __) => SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final status = _statuses[index];
                   final isSelected = status == currentStatus;
@@ -116,7 +116,7 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
                     selectedColor: AppTheme.primary,
                     backgroundColor: isPast ? const Color(0xFFE4F9EE) : Colors.white,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black87,
+                      color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                     ),
                     side: const BorderSide(color: AppTheme.cardBorder),
@@ -124,18 +124,18 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
               children: [
-                const Text('Milestones', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('Milestones', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 const Spacer(),
                 Text(
                   '${(_progress * 100).round()}% complete',
-                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: LinearProgressIndicator(
@@ -145,11 +145,11 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
                 valueColor: const AlwaysStoppedAnimation(AppTheme.primary),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             if (_milestones.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text('No milestones yet — add one below.', style: TextStyle(color: Colors.black45)),
+                child: Text('No milestones yet — add one below.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
               )
             else
               ..._milestones.map((m) => Card(
@@ -160,14 +160,14 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
                         m['title'] ?? '',
                         style: TextStyle(
                           decoration: m['done'] == true ? TextDecoration.lineThrough : null,
-                          color: m['done'] == true ? Colors.black45 : Colors.black87,
+                          color: m['done'] == true ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45) : Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       activeColor: AppTheme.primary,
                       controlAffinity: ListTileControlAffinity.leading,
                     ),
                   )),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -180,10 +180,10 @@ class _ProgressTrackerScreenState extends State<ProgressTrackerScreen> {
                     onSubmitted: (_) => _addMilestone(),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: _isBusy ? null : _addMilestone,
-                  child: const Icon(Icons.add, size: 18),
+                  child: Icon(Icons.add, size: 18),
                 ),
               ],
             ),

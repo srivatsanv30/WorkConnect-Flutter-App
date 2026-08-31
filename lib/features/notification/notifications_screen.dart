@@ -52,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
+        builder: (_) => Center(child: CircularProgressIndicator()),
       );
 
       final jobs = await _jobService.fetchJobs();
@@ -88,28 +88,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text('Notifications'),
         elevation: 0,
       ),
       body: RefreshIndicator(
         onRefresh: _loadNotifications,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: CircularProgressIndicator())
             : _notifications.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.notifications_off_outlined, size: 48, color: Colors.black26),
+                        Icon(Icons.notifications_off_outlined, size: 48, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26)),
                         SizedBox(height: 12),
-                        Text('No notifications yet', style: TextStyle(color: Colors.black45, fontWeight: FontWeight.w600)),
+                        Text('No notifications yet', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: _notifications.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, __) => SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final n = _notifications[index];
                       final isUnread = n['read'] != true;
@@ -153,7 +153,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   size: 20,
                                 ),
                               ),
-                              const SizedBox(width: 14),
+                              SizedBox(width: 14),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +166,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             style: TextStyle(
                                               fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
                                               fontSize: 14,
-                                              color: Colors.black87,
+                                              color: Theme.of(context).colorScheme.onSurface,
                                             ),
                                           ),
                                         ),
@@ -181,16 +181,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                           ),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 6),
                                     Text(
                                       body,
                                       style: TextStyle(
-                                        color: Colors.black54,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                         fontSize: 13,
                                         fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    SizedBox(height: 8),
                                     Row(
                                       children: [
                                         Container(
@@ -199,7 +199,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                             color: AppTheme.primary.withAlpha(20),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
-                                          child: const Text(
+                                          child: Text(
                                             'Request Type: Collaboration',
                                             style: TextStyle(
                                               color: AppTheme.primary,
@@ -211,7 +211,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                         const Spacer(),
                                         Text(
                                           dateStr,
-                                          style: const TextStyle(color: Colors.black38, fontSize: 11),
+                                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                                         ),
                                       ],
                                     ),

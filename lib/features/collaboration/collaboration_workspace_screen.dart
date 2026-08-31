@@ -63,14 +63,14 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('No project selected',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       SizedBox(height: 6),
                       Text(
                         'Please select or post a project from the Workspace Hub to '
                         'open the Collaboration Workspace.',
-                        style: TextStyle(color: Colors.black54),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                       ),
                     ],
                   ),
@@ -80,13 +80,13 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
               Expanded(
                 child: ListView.separated(
                   itemCount: _activeProjects.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, __) => SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final job = _activeProjects[index];
                     final title = job['title'] ?? 'Untitled Project';
                     final jobId = job['_id']?.toString() ?? '';
-                    final collaboratorName = (job['assignedTo'] is Map) ? job['assignedTo']['name'] ?? 'Unassigned' : 'Unassigned';
                     
+
                     return Card(
                       child: InkWell(
                         onTap: () {
@@ -111,39 +111,39 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                                   color: AppTheme.primary.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.chat_bubble_outline, color: AppTheme.primary),
+                                child: Icon(Icons.chat_bubble_outline, color: AppTheme.primary),
                               ),
-                              const SizedBox(width: 16),
+                              SizedBox(width: 16),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       title,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 6),
                                     Row(
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-                                          child: Text('Creator: ${(job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown'}', style: const TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          child: Text('Creator: ${(job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown'}', style: TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold)),
                                         ),
-                                        const SizedBox(width: 8),
+                                        SizedBox(width: 8),
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-                                          child: Text('Assignee: ${(job['assignedTo'] is Map) ? job['assignedTo']['name'] ?? 'Unknown' : 'Unknown'}', style: const TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          child: Text('Assignee: ${(job['assignedTo'] is Map) ? job['assignedTo']['name'] ?? 'Unknown' : 'Unknown'}', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold)),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black38),
+                              Icon(Icons.arrow_forward_ios, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                             ],
                           ),
                         ),

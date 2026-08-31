@@ -35,8 +35,12 @@ class ChatService {
     });
   }
 
-  void sendMessage(String jobId, String text) {
-    _socket?.emit('send_message', {'jobId': jobId, 'text': text});
+  void sendMessage(String jobId, String text, {String? imageUrl}) {
+    final payload = <String, dynamic>{'jobId': jobId, 'text': text};
+    if (imageUrl != null) {
+      payload['imageUrl'] = imageUrl;
+    }
+    _socket?.emit('send_message', payload);
   }
 
   void disconnect() {

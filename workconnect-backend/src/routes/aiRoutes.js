@@ -13,6 +13,16 @@ router.post('/breakdown', requireAuth, async (req, res) => {
       return res.status(400).json({ message: 'idea is required' });
     }
 
+    if (!process.env.GEMINI_API_KEY) {
+      // Mock response if API key is missing
+      return res.json({
+        title: idea.length > 20 ? idea.substring(0, 20) + "..." : idea,
+        description: "This is a mock project breakdown. Add a valid GEMINI_API_KEY to your .env file to get real AI-generated project plans.",
+        skillsRequired: ["Flutter", "Node.js", "MongoDB"],
+        milestones: ["Setup project structure", "Implement authentication", "Build core UI", "Integrate APIs", "Testing and deployment"]
+      });
+    }
+
     const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
     const prompt = `You are a project planning assistant. A user wants to build: "${idea}".

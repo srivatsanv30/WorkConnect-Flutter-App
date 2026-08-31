@@ -10,7 +10,6 @@ import 'reputation_ratings_screen.dart';
 import 'faq_screen.dart';
 import 'report_bug_screen.dart';
 
-
 class ProfileScreen extends StatelessWidget {
   final AppUser? user;
 
@@ -33,70 +32,94 @@ class ProfileScreen extends StatelessWidget {
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Profile Header
           Center(
             child: Column(
               children: [
                 Container(
-                  width: 88,
-                  height: 88,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     gradient: AppTheme.logoGradient,
                     shape: BoxShape.circle,
+                    border: Border.all(color: Theme.of(context).cardColor, width: 4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primary.withAlpha(50),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     initials,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
-                Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
-                Text(email, style: const TextStyle(color: Colors.black45, fontSize: 13)),
+                const SizedBox(height: 16),
+                Text(
+                  name,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  email,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 32),
 
           // Highlighted skills card
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
               gradient: AppTheme.logoGradient,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary.withAlpha(40),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.psychology_alt_outlined, color: Colors.white),
+                  child: const Icon(Icons.psychology_alt_outlined, color: Colors.white, size: 28),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Your Skills',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         skills.isEmpty ? 'No skills added yet' : skills.join(', '),
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13, height: 1.4),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -107,15 +130,23 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
+          // Settings Section
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 12),
+            child: Text(
+              'Account',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+            ),
+          ),
           _MenuGroup(
             children: [
               _MenuRow(
                 icon: Icons.person_outline,
                 label: 'Manage Profile',
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageProfileScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManageProfileScreen(user: user)));
                 },
               ),
               _MenuRow(
@@ -134,7 +165,17 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 24),
+
+          // Support Section
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 12),
+            child: Text(
+              'Support',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+            ),
+          ),
           _MenuGroup(
             children: [
               _MenuRow(
@@ -160,18 +201,23 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _MenuGroup(
-            children: [
-              _MenuRow(
-                icon: Icons.logout,
-                label: 'Sign Out',
-                iconColor: Colors.red,
-                labelColor: Colors.red,
-                showChevron: false,
-                onTap: () => _logout(context),
+          
+          const SizedBox(height: 32),
+
+          // Sign Out Button
+          ElevatedButton.icon(
+            onPressed: () => _logout(context),
+            icon: const Icon(Icons.logout, color: Colors.white),
+            label: const Text('Sign Out', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
+              elevation: 4,
+              shadowColor: Colors.redAccent.withAlpha(100),
+            ),
           ),
         ],
       ),
@@ -185,19 +231,24 @@ class _MenuGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F7FB),
-        borderRadius: BorderRadius.circular(16),
+    return Card(
+      elevation: 2,
+      shadowColor: Theme.of(context).colorScheme.shadow.withAlpha(20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        children: [
-          for (int i = 0; i < children.length; i++) ...[
-            children[i],
-            if (i != children.length - 1)
-              const Divider(height: 1, indent: 56, color: Color(0xFFEDEDF5)),
+      margin: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          children: [
+            for (int i = 0; i < children.length; i++) ...[
+              children[i],
+              if (i != children.length - 1)
+                Divider(height: 1, indent: 64, color: Theme.of(context).dividerColor.withAlpha(80)),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -208,16 +259,12 @@ class _MenuRow extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final Color iconColor;
-  final Color labelColor;
-  final bool showChevron;
 
   const _MenuRow({
     required this.icon,
     required this.label,
     required this.onTap,
     this.iconColor = AppTheme.primary,
-    this.labelColor = Colors.black87,
-    this.showChevron = true,
   });
 
   @override
@@ -225,19 +272,33 @@ class _MenuRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: iconColor),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withAlpha(25),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 22, color: iconColor),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(fontSize: 14, color: labelColor, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 15, 
+                  color: Theme.of(context).colorScheme.onSurface, 
+                  fontWeight: FontWeight.w600
+                ),
               ),
             ),
-            if (showChevron)
-              const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.black26),
+            Icon(
+              Icons.arrow_forward_ios_rounded, 
+              size: 16, 
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+            ),
           ],
         ),
       ),

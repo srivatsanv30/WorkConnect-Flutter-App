@@ -54,10 +54,10 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reputation & Ratings'),
+        title: Text('Reputation & Ratings'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadReputation,
               child: SingleChildScrollView(
@@ -75,7 +75,7 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                       ),
                       child: Column(
                         children: [
-                          const Text(
+                          Text(
                             'Your Trust Score',
                             style: TextStyle(
                               color: Colors.white70,
@@ -83,16 +83,16 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             '$_trustScore',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).cardColor,
                               fontSize: 56,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
@@ -101,15 +101,15 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                             ),
                             child: Text(
                               _tierLabel,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).cardColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
+                          SizedBox(height: 16),
+                          Text(
                             'Complete jobs and collaborate to build your reputation.',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.white70, fontSize: 12),
@@ -117,91 +117,91 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Stats row
                     Row(
                       children: [
                         Expanded(child: _buildStatCard('$_completedCount', 'Jobs\nCompleted', Icons.task_alt_outlined)),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(child: _buildStatCard('$_ratingCount', 'Reviews\nReceived', Icons.groups_outlined)),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(child: _buildStatCard('$_ratingAverage', 'Avg\nRating', Icons.star_outline)),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Milestones
-                    const Text(
+                    Text(
                       'Milestones',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     _buildMilestoneRow(
                       icon: Icons.emoji_events_outlined,
                       title: 'First Job Completed',
                       subtitle: 'Complete your first job to unlock',
                       isUnlocked: _completedCount >= 1,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     _buildMilestoneRow(
                       icon: Icons.verified_outlined,
                       title: 'Trusted Collaborator',
                       subtitle: 'Complete 5 jobs with a 4+ star rating',
                       isUnlocked: _completedCount >= 5 && _ratingAverage >= 4.0,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     _buildMilestoneRow(
                       icon: Icons.rocket_launch_outlined,
                       title: 'Rising Star',
                       subtitle: 'Reach a trust score of 50',
                       isUnlocked: _trustScore >= 50,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     _buildMilestoneRow(
                       icon: Icons.workspace_premium_outlined,
                       title: 'Top Contributor',
                       subtitle: 'Complete 25 jobs with excellent reviews',
                       isUnlocked: _completedCount >= 25,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Recent reviews
-                    const Text(
+                    Text(
                       'Recent Reviews',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black54,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     if (_reviews.isEmpty)
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF7F7FB),
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
-                            Icon(Icons.rate_review_outlined, size: 40, color: Colors.black26),
+                            Icon(Icons.rate_review_outlined, size: 40, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26)),
                             SizedBox(height: 12),
                             Text(
                               'No reviews yet',
-                              style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black54),
+                              style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                             ),
                             SizedBox(height: 4),
                             Text(
                               'Complete your first job to start receiving reviews from collaborators.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black38, fontSize: 12),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                             ),
                           ],
                         ),
@@ -216,9 +216,9 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF7F7FB),
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFEDEDF5)),
+                            border: Border.all(color: Theme.of(context).dividerColor),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,14 +231,14 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                                     size: 18,
                                   )),
                                   const Spacer(),
-                                  Text(reviewerName, style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.w600)),
+                                  Text(reviewerName, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12, fontWeight: FontWeight.w600)),
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Text(jobTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              SizedBox(height: 8),
+                              Text(jobTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                               if (reviewText.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text('"$reviewText"', style: const TextStyle(color: Colors.black54, fontStyle: FontStyle.italic, fontSize: 13)),
+                                SizedBox(height: 4),
+                                Text('"$reviewText"', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontStyle: FontStyle.italic, fontSize: 13)),
                               ],
                             ],
                           ),
@@ -255,26 +255,26 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F7FB),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Icon(icon, color: AppTheme.primary, size: 24),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: AppTheme.primaryDark,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 11, color: Colors.black45),
+            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
           ),
         ],
       ),
@@ -290,7 +290,7 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isUnlocked ? const Color(0xFFE4F9EE) : const Color(0xFFF7F7FB),
+        color: isUnlocked ? const Color(0xFFE4F9EE) : Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -301,16 +301,16 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
             decoration: BoxDecoration(
               color: isUnlocked
                   ? const Color(0xFF1DBF73).withAlpha(40)
-                  : Colors.black.withAlpha(15),
+                  : Theme.of(context).colorScheme.onSurface.withAlpha(15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
               size: 22,
-              color: isUnlocked ? const Color(0xFF1DBF73) : Colors.black38,
+              color: isUnlocked ? const Color(0xFF1DBF73) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,12 +320,12 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: isUnlocked ? Colors.black87 : Colors.black54,
+                    color: isUnlocked ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 11, color: Colors.black45),
+                  style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
                 ),
               ],
             ),
@@ -333,7 +333,7 @@ class _ReputationRatingsScreenState extends State<ReputationRatingsScreen> {
           Icon(
             isUnlocked ? Icons.check_circle : Icons.lock_outline,
             size: 20,
-            color: isUnlocked ? const Color(0xFF1DBF73) : Colors.black26,
+            color: isUnlocked ? const Color(0xFF1DBF73) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.26),
           ),
         ],
       ),

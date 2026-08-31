@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/app_theme.dart';
+import '../auth/user_model.dart';
+import '../auth/auth_service.dart';
 
 class ManageProfileScreen extends StatefulWidget {
-  const ManageProfileScreen({super.key});
+  final AppUser? user;
+  const ManageProfileScreen({super.key, this.user});
 
   @override
   State<ManageProfileScreen> createState() => _ManageProfileScreenState();
@@ -10,12 +13,24 @@ class ManageProfileScreen extends StatefulWidget {
 
 class _ManageProfileScreenState extends State<ManageProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: '');
-  final _titleController = TextEditingController(text: '');
-  final _bioController = TextEditingController(text: '');
-  final _phoneController = TextEditingController(text: '');
-  final _locationController = TextEditingController(text: '');
+  late TextEditingController _nameController;
+  late TextEditingController _titleController;
+  late TextEditingController _bioController;
+  late TextEditingController _phoneController;
+  late TextEditingController _locationController;
+  late TextEditingController _skillsController;
   bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.user?.name ?? '');
+    _titleController = TextEditingController(text: widget.user?.title ?? '');
+    _bioController = TextEditingController(text: widget.user?.bio ?? '');
+    _phoneController = TextEditingController(text: widget.user?.phone ?? '');
+    _locationController = TextEditingController(text: widget.user?.location ?? '');
+    _skillsController = TextEditingController(text: widget.user?.skills.join(', ') ?? '');
+  }
 
   @override
   void dispose() {
@@ -24,6 +39,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     _bioController.dispose();
     _phoneController.dispose();
     _locationController.dispose();
+    _skillsController.dispose();
     super.dispose();
   }
 
@@ -31,33 +47,55 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    // Simulate a save operation
-    await Future.delayed(const Duration(milliseconds: 800));
+    final skillsList = _skillsController.text
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    final result = await AuthService().updateProfile(
+      name: _nameController.text.trim(),
+      title: _titleController.text.trim(),
+      bio: _bioController.text.trim(),
+      phone: _phoneController.text.trim(),
+      location: _locationController.text.trim(),
+      skills: skillsList,
+    );
 
     if (!mounted) return;
     setState(() => _isSaving = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20),
-            SizedBox(width: 10),
-            Text('Profile updated successfully!'),
-          ],
+    if (result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Theme.of(context).cardColor, size: 20),
+              SizedBox(width: 10),
+              Text('Profile updated successfully!'),
+            ],
+          ),
+          backgroundColor: const Color(0xFF1DBF73),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        backgroundColor: const Color(0xFF1DBF73),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+      );
+      Navigator.pop(context, result.user);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.errorMessage ?? 'Failed to update profile'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Profile'),
+        title: Text('Manage Profile'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -78,7 +116,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                         shape: BoxShape.circle,
                       ),
                       alignment: Alignment.center,
-                      child: const Icon(Icons.person, color: Colors.white, size: 48),
+                      child: Text(
+                        _nameController.text.isNotEmpty ? _nameController.text[0].toUpperCase() : '?',
+                        style: TextStyle(color: Theme.of(context).cardColor, fontSize: 36, fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -89,26 +130,26 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                         decoration: BoxDecoration(
                           color: AppTheme.primary,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: Theme.of(context).cardColor, width: 2),
                         ),
-                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                        child: Icon(Icons.camera_alt, color: Theme.of(context).cardColor, size: 16),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-              const Center(
+              SizedBox(height: 8),
+              Center(
                 child: Text(
                   'Tap to change photo',
-                  style: TextStyle(color: Colors.black45, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
 
               // Form fields
               _buildSectionLabel('Full Name'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -117,10 +158,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Name is required' : null,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               _buildSectionLabel('Job Title'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
@@ -128,10 +169,21 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                   prefixIcon: Icon(Icons.work_outline),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
+
+              _buildSectionLabel('Skills'),
+              SizedBox(height: 8),
+              TextFormField(
+                controller: _skillsController,
+                decoration: const InputDecoration(
+                  hintText: 'e.g. Flutter, Dart, Firebase',
+                  prefixIcon: Icon(Icons.psychology_alt_outlined),
+                ),
+              ),
+              SizedBox(height: 20),
 
               _buildSectionLabel('Bio'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _bioController,
                 maxLines: 3,
@@ -143,10 +195,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               _buildSectionLabel('Phone Number'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
@@ -155,32 +207,32 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               _buildSectionLabel('Location'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _locationController,
                 decoration: const InputDecoration(
-                  hintText: '',
+                  hintText: 'e.g. New York, USA',
                   prefixIcon: Icon(Icons.location_on_outlined),
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               // Save button
               ElevatedButton(
                 onPressed: _isSaving ? null : _saveProfile,
                 child: _isSaving
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                         ),
                       )
-                    : const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    : Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -192,10 +244,10 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
   Widget _buildSectionLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: Colors.black54,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
         letterSpacing: 0.3,
       ),
     );

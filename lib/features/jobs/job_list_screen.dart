@@ -10,7 +10,7 @@ class JobListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jobs & Tasks'),
+        title: Text('Jobs & Tasks'),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -23,13 +23,13 @@ class JobListScreen extends StatelessWidget {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add),
       ),
-      body: const Center(
+      body: Center(
         child: Text(
           'You are logged in!\nNo jobs yet — post one to get started.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.black54),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
         ),
       ),
     );

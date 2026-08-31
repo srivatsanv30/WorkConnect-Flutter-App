@@ -21,7 +21,7 @@ class WorkspaceHubScreen extends StatefulWidget {
 }
 
 class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
-  final List<String> _skillFilters = const [
+  final List<String> _skillFilters = [
     'All', 'React', 'Flutter', 'Node.js', 'Python', 'Firebase'
   ];
   String _selectedFilter = 'All';
@@ -71,28 +71,28 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Hub',
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         'Welcome back, ${widget.userName}. AI has found new '
                         'opportunities matching your profile.',
-                        style: const TextStyle(color: Colors.black54, fontSize: 13),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: widget.onPostProject,
-              icon: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text('Post New Project'),
+              icon: Icon(Icons.auto_awesome, size: 18),
+              label: Text('Post New Project'),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -104,7 +104,7 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                 StatCard(
                   icon: Icons.emoji_events_outlined,
                   iconColor: AppTheme.primary,
-                  iconBg: const Color(0xFFEDEBFB),
+                  iconBg: AppTheme.primary.withValues(alpha: 0.15),
                   value: '0',
                   label: 'REPUTATION XP',
                   sublabel: 'New Creator',
@@ -112,15 +112,15 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                 StatCard(
                   icon: Icons.access_time,
                   iconColor: const Color(0xFF00A9E0),
-                  iconBg: const Color(0xFFE3F6FD),
+                  iconBg: const Color(0xFF00A9E0).withValues(alpha: 0.15),
                   value: '${_jobs.length}',
                   label: 'ACTIVE PROJECTS',
                   sublabel: '${_jobs.length} active workspaces',
                 ),
-                const StatCard(
+                StatCard(
                   icon: Icons.check_circle_outline,
                   iconColor: Color(0xFF1DBF73),
-                  iconBg: Color(0xFFE4F9EE),
+                  iconBg: const Color(0xFF1DBF73).withValues(alpha: 0.15),
                   value: '0',
                   label: 'TASKS COMPLETED',
                   sublabel: 'Milestones completed',
@@ -128,29 +128,29 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                 StatCard(
                   icon: Icons.people_outline,
                   iconColor: const Color(0xFFE0A800),
-                  iconBg: const Color(0xFFFFF6E0),
+                  iconBg: const Color(0xFFE0A800).withValues(alpha: 0.15),
                   value: '${_jobs.where((job) => job['assignedTo'] != null).map((job) => (job['assignedTo'] is Map) ? job['assignedTo']['_id']?.toString() : job['assignedTo']?.toString()).where((id) => id != null).toSet().length}',
                   label: 'COLLABORATORS',
                   sublabel: 'Active partners',
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
-              children: const [
+              children: [
                 Icon(Icons.hub_outlined, size: 18, color: AppTheme.primary),
                 SizedBox(width: 6),
                 Text('Smart Match Recommendations',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             SizedBox(
               height: 36,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _skillFilters.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, __) => SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final filter = _skillFilters[index];
                   final selected = filter == _selectedFilter;
@@ -160,18 +160,18 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                     onSelected: (_) => setState(() => _selectedFilter = filter),
                     selectedColor: AppTheme.primary,
                     labelStyle: TextStyle(
-                      color: selected ? Colors.white : Colors.black87,
+                      color: selected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                     ),
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).cardColor,
                     side: const BorderSide(color: AppTheme.cardBorder),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             if (_isLoading)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(child: CircularProgressIndicator()),
               )
@@ -183,7 +183,7 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                     child: Text(
                       'No projects match this skill filter.\nPost a new job or clear filters!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black45),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
                     ),
                   ),
                 ),
@@ -237,54 +237,54 @@ class _JobCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEDEBFB),
+                    color: AppTheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     priority,
-                    style: const TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               description,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.black54, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             if (skills.isNotEmpty)
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
                 children: skills
                     .map((s) => Chip(
-                          label: Text(s, style: const TextStyle(fontSize: 11)),
-                          backgroundColor: const Color(0xFFF3F6FD),
+                          label: Text(s, style: TextStyle(fontSize: 11)),
+                          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                           side: BorderSide.none,
                           padding: EdgeInsets.zero,
                           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ))
                     .toList(),
               ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.person_outline, size: 14, color: Colors.black38),
-                const SizedBox(width: 4),
-                Text('Posted by $creatorName', style: const TextStyle(fontSize: 11, color: Colors.black38)),
+                Icon(Icons.person_outline, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                SizedBox(width: 4),
+                Text('Posted by $creatorName', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
                 if (createdDateText.isNotEmpty) ...[
                   const Spacer(),
-                  const Icon(Icons.calendar_today, size: 12, color: Colors.black38),
-                  const SizedBox(width: 4),
-                  Text('Created: $createdDateText', style: const TextStyle(fontSize: 11, color: Colors.black38)),
+                  Icon(Icons.calendar_today, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                  SizedBox(width: 4),
+                  Text('Created: $createdDateText', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
                 ],
               ],
             ),

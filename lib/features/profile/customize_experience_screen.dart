@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../../core/app_theme.dart';
+import '../../core/theme_provider.dart';
 
 class CustomizeExperienceScreen extends StatefulWidget {
   const CustomizeExperienceScreen({super.key});
@@ -22,10 +24,22 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
     _loadPreferences();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final themeMode = Provider.of<ThemeProvider>(context, listen: false).themeMode;
+    if (themeMode == ThemeMode.light) {
+      _selectedTheme = 'Light';
+    } else if (themeMode == ThemeMode.dark) {
+      _selectedTheme = 'Dark';
+    } else {
+      _selectedTheme = 'System Default';
+    }
+  }
+
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedTheme = prefs.getString('theme') ?? 'Light';
       _compactView = prefs.getBool('compact_view') ?? false;
       _showAnimations = prefs.getBool('show_animations') ?? true;
       _accessibilityMode = prefs.getBool('accessibility_mode') ?? false;
@@ -35,18 +49,27 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
 
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme', _selectedTheme);
     await prefs.setBool('compact_view', _compactView);
     await prefs.setBool('show_animations', _showAnimations);
     await prefs.setBool('accessibility_mode', _accessibilityMode);
     await prefs.setString('language', _language);
     
     if (!mounted) return;
+
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    if (_selectedTheme == 'Light') {
+      themeProvider.setThemeMode(ThemeMode.light);
+    } else if (_selectedTheme == 'Dark') {
+      themeProvider.setThemeMode(ThemeMode.dark);
+    } else {
+      themeProvider.setThemeMode(ThemeMode.system);
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            Icon(Icons.check_circle, color: Theme.of(context).cardColor, size: 20),
             SizedBox(width: 10),
             Text('Preferences saved!'),
           ],
@@ -62,7 +85,7 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customize My Experience'),
+        title: Text('Customize My Experience'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -73,10 +96,10 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: AppTheme.heroGradient,
+                gradient: AppTheme.getHeroGradient(context),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.palette_outlined, color: AppTheme.primary, size: 28),
                   SizedBox(width: 12),
@@ -91,7 +114,7 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
                         SizedBox(height: 2),
                         Text(
                           'Customize how WorkConnect looks and feels.',
-                          style: TextStyle(color: Colors.black45, fontSize: 12),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
                         ),
                       ],
                     ),
@@ -99,18 +122,18 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Appearance Section
             _buildSectionTitle('Appearance'),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSettingsCard(
               children: [
                 _buildDropdownRow(
                   icon: Icons.brightness_6_outlined,
                   label: 'Theme',
                   value: _selectedTheme,
-                  items: const ['Light', 'Dark', 'System Default'],
+                  items: ['Light', 'Dark', 'System Default'],
                   onChanged: (v) => setState(() => _selectedTheme = v!),
                 ),
                 const Divider(height: 1, indent: 52),
@@ -131,11 +154,11 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Accessibility Section
             _buildSectionTitle('Accessibility'),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSettingsCard(
               children: [
                 _buildSwitchRow(
@@ -150,17 +173,17 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
                   icon: Icons.language_outlined,
                   label: 'Language',
                   value: _language,
-                  items: const ['English', 'Tamil', 'Hindi', 'Spanish'],
+                  items: ['English', 'Tamil', 'Hindi', 'Spanish'],
                   onChanged: (v) => setState(() => _language = v!),
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Save button
             ElevatedButton(
               onPressed: _savePreferences,
-              child: const Text('Save Preferences', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              child: Text('Save Preferences', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -171,10 +194,10 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: Colors.black54,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
         letterSpacing: 0.5,
       ),
     );
@@ -183,7 +206,7 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
   Widget _buildSettingsCard({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F7FB),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),
@@ -202,13 +225,13 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
       child: Row(
         children: [
           Icon(icon, size: 22, color: AppTheme.primary),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.black45)),
+                Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                Text(subtitle, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
               ],
             ),
           ),
@@ -234,14 +257,14 @@ class _CustomizeExperienceScreenState extends State<CustomizeExperienceScreen> {
       child: Row(
         children: [
           Icon(icon, size: 22, color: AppTheme.primary),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
-            child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            child: Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           ),
           DropdownButton<String>(
             value: value,
             underline: const SizedBox.shrink(),
-            style: const TextStyle(fontSize: 13, color: Colors.black87),
+            style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
             items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
             onChanged: onChanged,
           ),

@@ -16,7 +16,7 @@ class PublicProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Applicant Profile'),
+        title: Text('Applicant Profile'),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -37,69 +37,69 @@ class PublicProfileScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       initials,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).cardColor,
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Text(
                     name,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   if (email.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       email,
-                      style: const TextStyle(color: Colors.black54, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
                     ),
                   ],
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             Row(
               children: [
-                Expanded(child: _buildStatCard('XP Obtained', user.xp.toString(), Icons.star_border)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Projects', user.projectsCompleted.toString(), Icons.check_circle_outline)),
+                Expanded(child: _buildStatCard(context, 'XP Obtained', user.xp.toString(), Icons.star_border)),
+                SizedBox(width: 12),
+                Expanded(child: _buildStatCard(context, 'Projects', user.projectsCompleted.toString(), Icons.check_circle_outline)),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: _buildStatCard('Score', user.ratingAverage.toStringAsFixed(1), Icons.bar_chart)),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('Reviews', user.ratingCount.toString(), Icons.rate_review_outlined)),
+                Expanded(child: _buildStatCard(context, 'Score', user.ratingAverage.toStringAsFixed(1), Icons.bar_chart)),
+                SizedBox(width: 12),
+                Expanded(child: _buildStatCard(context, 'Reviews', user.ratingCount.toString(), Icons.rate_review_outlined)),
               ],
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             if (skills.isNotEmpty) ...[
-              const Text(
+              Text(
                 'Skills',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: skills.map((s) => Chip(
                   label: Text(s),
                   backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
-                  labelStyle: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600),
+                  labelStyle: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600),
                   side: BorderSide.none,
                 )).toList(),
               ),
             ],
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F7FB),
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFEDEDF5)),
+                border: Border.all(color: Theme.of(context).dividerColor),
               ),
               child: Row(
                 children: [
@@ -109,16 +109,16 @@ class PublicProfileScreen extends StatelessWidget {
                       color: AppTheme.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.verified_user_outlined, color: AppTheme.primary),
+                    child: Icon(Icons.verified_user_outlined, color: AppTheme.primary),
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
+                  SizedBox(width: 16),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('WorkConnect Member', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         SizedBox(height: 4),
-                        Text('Verified applicant ready to collaborate.', style: TextStyle(color: Colors.black54, fontSize: 13)),
+                        Text('Verified applicant ready to collaborate.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
                       ],
                     ),
                   ),
@@ -130,16 +130,16 @@ class PublicProfileScreen extends StatelessWidget {
       ),
     );
   }
-  Widget _buildStatCard(String title, String value, IconData icon) {
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEDEDF5)),
+        border: Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -148,15 +148,15 @@ class PublicProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: AppTheme.primary, size: 28),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             title,
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
             textAlign: TextAlign.center,
           ),
         ],

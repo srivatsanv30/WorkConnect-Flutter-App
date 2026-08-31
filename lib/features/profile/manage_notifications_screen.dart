@@ -21,7 +21,7 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Notifications'),
+        title: Text('Manage Notifications'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -32,10 +32,10 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: AppTheme.heroGradient,
+                gradient: AppTheme.getHeroGradient(context),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.notifications_active_outlined, color: AppTheme.primary, size: 28),
                   SizedBox(width: 12),
@@ -50,7 +50,7 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
                         SizedBox(height: 2),
                         Text(
                           'Choose what notifications you want to receive.',
-                          style: TextStyle(color: Colors.black45, fontSize: 12),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
                         ),
                       ],
                     ),
@@ -58,11 +58,11 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // General
             _buildSectionTitle('General'),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSettingsCard(
               children: [
                 _buildToggleRow(
@@ -90,11 +90,11 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Activity Alerts
             _buildSectionTitle('Activity Alerts'),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSettingsCard(
               children: [
                 _buildToggleRow(
@@ -130,16 +130,16 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Save button
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Row(
+                    content: Row(
                       children: [
-                        Icon(Icons.check_circle, color: Colors.white, size: 20),
+                        Icon(Icons.check_circle, color: Theme.of(context).cardColor, size: 20),
                         SizedBox(width: 10),
                         Text('Notification preferences saved!'),
                       ],
@@ -150,7 +150,7 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
                   ),
                 );
               },
-              child: const Text('Save Preferences', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              child: Text('Save Preferences', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -161,10 +161,10 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: Colors.black54,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
         letterSpacing: 0.5,
       ),
     );
@@ -173,7 +173,7 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
   Widget _buildSettingsCard({required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F7FB),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),
@@ -192,13 +192,13 @@ class _ManageNotificationsScreenState extends State<ManageNotificationsScreen> {
       child: Row(
         children: [
           Icon(icon, size: 22, color: AppTheme.primary),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.black45)),
+                Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                Text(subtitle, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45))),
               ],
             ),
           ),

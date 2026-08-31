@@ -130,42 +130,42 @@ class _PostJobScreenState extends State<PostJobScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Create Collaborative Project',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
-            const Text(
+            SizedBox(height: 4),
+            Text(
               'Define the deliverables, invite teammates, and run AI '
               'assistance to auto-breakdown milestones.',
-              style: TextStyle(color: Colors.black54, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F1FD),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFDDD6F9)),
+                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
+                    children: [
                       Icon(Icons.psychology_alt_outlined, color: AppTheme.primary, size: 20),
                       SizedBox(width: 8),
                       Text('AI Task Breakdown Assistant',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
+                  SizedBox(height: 6),
+                  Text(
                     'Enter your idea (e.g. "Flutter chat app") and let AI '
                     'structure the deliverables.',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   TextField(
                     controller: _aiIdeaController,
                     decoration: const InputDecoration(
@@ -173,18 +173,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       isDense: true,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: _isBreakingDown ? null : _handleAiBreakdown,
                       icon: _isBreakingDown
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 14,
                               width: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
                             )
-                          : const Icon(Icons.auto_fix_high, size: 16),
+                          : Icon(Icons.auto_fix_high, size: 16),
                       label: Text(_isBreakingDown ? 'Thinking...' : 'Breakdown'),
                     ),
                   ),
@@ -192,35 +192,35 @@ class _PostJobScreenState extends State<PostJobScreen> {
               ),
             ),
             if (_milestones.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Text('AI-Generated Milestones', style: TextStyle(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
+              SizedBox(height: 16),
+              Text('AI-Generated Milestones', style: TextStyle(fontWeight: FontWeight.w600)),
+              SizedBox(height: 8),
               ...List.generate(_milestones.length, (i) => Card(
                 child: ListTile(
                   leading: CircleAvatar(
                     radius: 14,
                     backgroundColor: AppTheme.primary.withAlpha(25),
-                    child: Text('${i + 1}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                    child: Text('${i + 1}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
                   ),
-                  title: Text(_milestones[i], style: const TextStyle(fontSize: 14)),
+                  title: Text(_milestones[i], style: TextStyle(fontSize: 14)),
                   trailing: IconButton(
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: Icon(Icons.close, size: 18),
                     onPressed: () => setState(() => _milestones.removeAt(i)),
                   ),
                 ),
               )),
             ],
-            const SizedBox(height: 24),
-            const Text('Project Title', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
+            SizedBox(height: 24),
+            Text('Project Title', style: TextStyle(fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
             TextFormField(
               controller: _titleController,
               decoration: const InputDecoration(hintText: 'e.g. Build API integration backend'),
               validator: (v) => (v == null || v.trim().isEmpty) ? 'Title is required' : null,
             ),
-            const SizedBox(height: 16),
-            const Text('Detailed Description', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
+            SizedBox(height: 16),
+            Text('Detailed Description', style: TextStyle(fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
             TextFormField(
               controller: _descriptionController,
               maxLines: 4,
@@ -229,34 +229,34 @@ class _PostJobScreenState extends State<PostJobScreen> {
               ),
               validator: (v) => (v == null || v.trim().isEmpty) ? 'Description is required' : null,
             ),
-            const SizedBox(height: 16),
-            const Text('Required Skills (comma separated)', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
+            SizedBox(height: 16),
+            Text('Required Skills (comma separated)', style: TextStyle(fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
             TextFormField(
               controller: _skillsController,
               decoration: const InputDecoration(hintText: 'e.g. React, Node.js, Express'),
             ),
-            const SizedBox(height: 16),
-            const Text('Priority level', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
+            SizedBox(height: 16),
+            Text('Priority level', style: TextStyle(fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
             DropdownButtonFormField<String>(
               initialValue: _priority,
-              items: const ['Low', 'Medium', 'High', 'Urgent']
+              items: ['Low', 'Medium', 'High', 'Urgent']
                   .map((p) => DropdownMenuItem(value: p, child: Text(p)))
                   .toList(),
               onChanged: (v) => setState(() => _priority = v ?? 'Medium'),
             ),
-            const SizedBox(height: 16),
-            const Text('Target Deadline', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
+            SizedBox(height: 16),
+            Text('Target Deadline', style: TextStyle(fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
             InkWell(
               onTap: _pickDeadline,
               child: InputDecorator(
                 decoration: const InputDecoration(),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.black45),
-                    const SizedBox(width: 10),
+                    Icon(Icons.calendar_today_outlined, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
+                    SizedBox(width: 10),
                     Text(
                       _deadline == null
                           ? 'Select a date'
@@ -264,29 +264,29 @@ class _PostJobScreenState extends State<PostJobScreen> {
                             '${_deadline!.month.toString().padLeft(2, '0')}-'
                             '${_deadline!.year}',
                       style: TextStyle(
-                        color: _deadline == null ? Colors.black45 : Colors.black87,
+                        color: _deadline == null ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45) : Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             if (_errorMessage != null) ...[
-              Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 12),
+              Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+              SizedBox(height: 12),
             ],
             ElevatedButton(
               onPressed: _isLoading ? null : _handleSubmit,
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
                     )
-                  : const Text('Post Project'),
+                  : Text('Post Project'),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
           ],
         ),
       ),

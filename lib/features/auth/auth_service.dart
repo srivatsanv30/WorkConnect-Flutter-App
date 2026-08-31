@@ -46,6 +46,48 @@ class AuthService {
     );
   }
 
+  Future<AuthResult> updateProfile({
+    String? name,
+    List<String>? skills,
+    String? bio,
+    String? title,
+    String? phone,
+    String? location,
+  }) async {
+    final token = await getToken();
+    if (token == null) return AuthResult(success: false, errorMessage: 'Not logged in');
+
+    try {
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (skills != null) body['skills'] = skills;
+      if (bio != null) body['bio'] = bio;
+      if (title != null) body['title'] = title;
+      if (phone != null) body['phone'] = phone;
+      if (location != null) body['location'] = location;
+
+      final response = await http.put(
+        Uri.parse('${AppConstants.baseUrl}/users/me'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        final user = AppUser.fromJson(data['user']);
+        return AuthResult(success: true, user: user);
+      } else {
+        return AuthResult(success: false, errorMessage: data['message'] ?? 'Update failed');
+      }
+    } catch (e) {
+      return AuthResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
   Future<AuthResult> _authRequest({
     required String endpoint,
     required Map<String, dynamic> body,

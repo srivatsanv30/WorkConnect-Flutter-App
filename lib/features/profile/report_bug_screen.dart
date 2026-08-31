@@ -38,9 +38,9 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            Icon(Icons.check_circle, color: Theme.of(context).cardColor, size: 20),
             SizedBox(width: 10),
             Expanded(child: Text('Bug report submitted! We\'ll review it shortly.')),
           ],
@@ -57,7 +57,7 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Report a Bug'),
+        title: Text('Report a Bug'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -73,7 +73,7 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                   color: const Color(0xFFFFF3E0),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.bug_report_outlined, color: Color(0xFFE65100), size: 28),
                     SizedBox(width: 12),
@@ -88,7 +88,7 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                           SizedBox(height: 2),
                           Text(
                             'Describe the issue and we\'ll fix it as soon as possible.',
-                            style: TextStyle(color: Colors.black45, fontSize: 12),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
                           ),
                         ],
                       ),
@@ -96,11 +96,11 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
 
               // Bug Title
               _buildSectionLabel('Bug Title'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
@@ -109,11 +109,11 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter a title' : null,
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // Category dropdown
               _buildSectionLabel('Category'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -125,8 +125,8 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                   child: DropdownButton<String>(
                     value: _category,
                     isExpanded: true,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                    items: const [
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                    items: [
                       'UI / Visual',
                       'Functionality',
                       'Performance',
@@ -137,11 +137,11 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // Severity dropdown
               _buildSectionLabel('Severity'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -153,19 +153,19 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                   child: DropdownButton<String>(
                     value: _severity,
                     isExpanded: true,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                    items: const ['Low', 'Medium', 'High', 'Critical']
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface),
+                    items: ['Low', 'Medium', 'High', 'Critical']
                         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                         .toList(),
                     onChanged: (v) => setState(() => _severity = v!),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // Description
               _buildSectionLabel('Description'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 5,
@@ -178,21 +178,21 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
                     ? 'Please describe the bug in detail (at least 10 characters)'
                     : null,
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               // Submit button
               ElevatedButton(
                 onPressed: _isSubmitting ? null : _submitReport,
                 child: _isSubmitting
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                         ),
                       )
-                    : const Text('Submit Report', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    : Text('Submit Report', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -204,10 +204,10 @@ class _ReportBugScreenState extends State<ReportBugScreen> {
   Widget _buildSectionLabel(String label) {
     return Text(
       label,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: Colors.black54,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
         letterSpacing: 0.3,
       ),
     );

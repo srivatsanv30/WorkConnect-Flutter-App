@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'core/app_theme.dart';
+import 'core/theme_provider.dart';
 import 'features/auth/auth_screen.dart';
 
 void main() async {
@@ -9,7 +11,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const WorkConnectApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const WorkConnectApp(),
+    ),
+  );
 }
 
 class WorkConnectApp extends StatelessWidget {
@@ -17,10 +24,14 @@ class WorkConnectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'WorkConnect',
       debugShowCheckedModeBanner: false,
+      themeMode: themeProvider.themeMode,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       home: const AuthScreen(),
     );
   }

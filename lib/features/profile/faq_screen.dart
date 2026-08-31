@@ -52,7 +52,7 @@ class FAQScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('FAQ'),
+        title: Text('FAQ'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -63,10 +63,10 @@ class FAQScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: AppTheme.heroGradient,
+                gradient: AppTheme.getHeroGradient(context),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.help_outline, color: AppTheme.primary, size: 28),
                   SizedBox(width: 12),
@@ -81,7 +81,7 @@ class FAQScreen extends StatelessWidget {
                         SizedBox(height: 2),
                         Text(
                           'Find answers to common questions about WorkConnect.',
-                          style: TextStyle(color: Colors.black45, fontSize: 12),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
                         ),
                       ],
                     ),
@@ -89,12 +89,12 @@ class FAQScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // FAQ items
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F7FB),
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
               ),
               clipBehavior: Clip.antiAlias,
@@ -116,7 +116,7 @@ class FAQScreen extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             '${i + 1}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppTheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -125,7 +125,7 @@ class FAQScreen extends StatelessWidget {
                         ),
                         title: Text(
                           faq['q']!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -133,8 +133,8 @@ class FAQScreen extends StatelessWidget {
                         children: [
                           Text(
                             faq['a']!,
-                            style: const TextStyle(
-                              color: Colors.black54,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                               fontSize: 13,
                               height: 1.5,
                             ),

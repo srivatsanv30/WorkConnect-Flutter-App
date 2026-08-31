@@ -7,6 +7,9 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     skills: { type: [String], default: [] },
     bio: { type: String, default: '' },
+    title: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    location: { type: String, default: '' },
     availability: {
       type: String,
       enum: ['available', 'busy', 'offline'],

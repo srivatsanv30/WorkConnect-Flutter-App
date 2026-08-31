@@ -129,22 +129,16 @@ class _AuthScreenState extends State<AuthScreen> {
       _AuthMode.forgotPassword => 'Sign in',
     };
 
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: SafeArea(
+    return Container(
+      decoration: BoxDecoration(gradient: AppTheme.getHeroGradient(context)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
+              Padding(
                 padding: const EdgeInsets.fromLTRB(24, 26, 24, 32),
-                decoration: BoxDecoration(
-                  gradient: AppTheme.heroGradient,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -157,7 +151,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             color: Colors.white24,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.medical_services_rounded,
                             color: Colors.white,
                             size: 30,
@@ -187,10 +181,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       ],
                     ),
                     const SizedBox(height: 28),
-                    const Text(
+                    Text(
                       'WorkConnect',
                       style: TextStyle(
-                        color: Color(0xFF0D4A76),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
@@ -199,7 +193,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     Text(
                       'Trusted app designed for Workers and freelancers.',
                       style: TextStyle(
-                        color: Colors.black87.withAlpha(209),
+                        color: Theme.of(context).colorScheme.onSurface.withAlpha(209),
                         fontSize: 15,
                         height: 1.6,
                       ),
@@ -234,18 +228,18 @@ class _AuthScreenState extends State<AuthScreen> {
                             const SizedBox(height: 22),
                             Text(
                               title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF102C45),
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               subtitle,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black54,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 height: 1.5,
                               ),
                             ),
@@ -331,17 +325,17 @@ class _AuthScreenState extends State<AuthScreen> {
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
                                   onPressed: () => _switchMode(_AuthMode.forgotPassword),
-                                  child: const Text('Forgot password?', style: TextStyle(fontSize: 13)),
+                                  child: Text('Forgot password?', style: TextStyle(fontSize: 13)),
                                 ),
                               ),
                             ],
 
                             if (_mode == _AuthMode.signUp) ...[
                               const SizedBox(height: 12),
-                              const Text(
+                              Text(
                                 'By signing up, you agree to our Terms & Conditions and Privacy Policy',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 11, color: Colors.black38),
+                                style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface),
                               ),
                             ],
 
@@ -356,7 +350,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                                 child: Text(
                                   _errorMessage!,
-                                  style: const TextStyle(color: Color(0xFFB00020), fontSize: 13),
+                                  style: TextStyle(color: Color(0xFFB00020), fontSize: 13),
                                 ),
                               ),
                               const SizedBox(height: 14),
@@ -371,7 +365,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                                 child: Text(
                                   _infoMessage!,
-                                  style: const TextStyle(color: AppTheme.primary, fontSize: 13),
+                                  style: TextStyle(color: AppTheme.primary, fontSize: 13),
                                 ),
                               ),
                               const SizedBox(height: 14),
@@ -402,7 +396,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                           _AuthMode.signUp => 'Create Account',
                                           _AuthMode.forgotPassword => 'Send OTP',
                                         },
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -410,52 +404,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             ),
 
-                            if (_mode == _AuthMode.signIn) ...[
-                              const SizedBox(height: 26),
-                              Row(
-                                children: const [
-                                  Expanded(child: Divider()),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10),
-                                    child: Text(
-                                      'Or continue with',
-                                      style: TextStyle(fontSize: 12, color: Colors.black38),
-                                    ),
-                                  ),
-                                  Expanded(child: Divider()),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _SocialButton(
-                                      icon: Icons.g_mobiledata,
-                                      iconColor: Colors.redAccent,
-                                      label: 'Google',
-                                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Google Sign-In not wired up yet.'),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: _SocialButton(
-                                      icon: Icons.facebook,
-                                      iconColor: Color(0xFF1877F2),
-                                      label: 'Facebook',
-                                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Facebook Sign-In not wired up yet.'),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+
 
                             const SizedBox(height: 24),
                             Row(
@@ -463,7 +412,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               children: [
                                 Text(
                                   switchPrompt,
-                                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                                  style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -475,7 +424,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   },
                                   child: Text(
                                     switchAction,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppTheme.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -494,6 +443,7 @@ class _AuthScreenState extends State<AuthScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -529,9 +479,9 @@ class _RoundedField extends StatelessWidget {
         prefixIcon: Icon(icon, size: 22, color: AppTheme.primary),
         suffixIcon: suffixIcon,
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black38, fontSize: 14),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
         filled: true,
-        fillColor: const Color(0xFFEFF8FF),
+        fillColor: Theme.of(context).cardColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 18),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(22),
@@ -545,34 +495,6 @@ class _RoundedField extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
         ),
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final VoidCallback onTap;
-
-  const _SocialButton({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, color: iconColor, size: 20),
-      label: Text(label, style: const TextStyle(color: Colors.black87, fontSize: 13)),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        side: BorderSide(color: AppTheme.primary.withAlpha(46)),
       ),
     );
   }
@@ -627,11 +549,11 @@ class _ModeTab extends StatelessWidget {
           onPressed: onTap,
           style: OutlinedButton.styleFrom(
             backgroundColor:
-              isActive ? AppTheme.primary.withAlpha(31) : Colors.white,
+              isActive ? AppTheme.primary.withAlpha(31) : Theme.of(context).cardColor,
             side: BorderSide(
               color: isActive ? AppTheme.primary : AppTheme.cardBorder,
             ),
-            foregroundColor: isActive ? AppTheme.primary : Colors.black87,
+            foregroundColor: isActive ? AppTheme.primary : Theme.of(context).colorScheme.onSurface,
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           ),
@@ -671,7 +593,7 @@ class _HeaderBadge extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
           ),
         ],
       ),

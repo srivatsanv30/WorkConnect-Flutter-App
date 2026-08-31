@@ -21,7 +21,7 @@ class HomeOverviewScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: AppTheme.heroGradient,
+              gradient: AppTheme.getHeroGradient(context),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -30,12 +30,12 @@ class HomeOverviewScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '✨ WELCOME, ${userName.toUpperCase()}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.primary,
@@ -43,8 +43,8 @@ class HomeOverviewScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'Collaborate, Assign,\nTrack & Build',
                   style: TextStyle(
                     fontSize: 28,
@@ -52,14 +52,14 @@ class HomeOverviewScreen extends StatelessWidget {
                     height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Text(
+                SizedBox(height: 12),
+                Text(
                   'WorkConnect is a hybrid workspace bridging project management, '
                   'remote mentorship, and real-time collaboration. Structure tasks, '
                   'get AI guidance, and build together.',
-                  style: TextStyle(color: Colors.black54, height: 1.4),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.4),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: () => onNavigate(1),
                   style: ElevatedButton.styleFrom(
@@ -70,13 +70,13 @@ class HomeOverviewScreen extends StatelessWidget {
                     ),
                     elevation: 2,
                   ),
-                  icon: const Icon(Icons.arrow_forward, size: 18),
-                  label: const Text(
+                  icon: Icon(Icons.arrow_forward, size: 18),
+                  label: Text(
                     'Enter Workspace Hub',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 OutlinedButton(
                   onPressed: () => onNavigate(2),
                   style: OutlinedButton.styleFrom(
@@ -87,45 +87,45 @@ class HomeOverviewScreen extends StatelessWidget {
                     ),
                     side: const BorderSide(color: AppTheme.cardBorder),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Post a Project',
-                    style: TextStyle(color: Colors.black87),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 28),
-          const Text(
+          SizedBox(height: 28),
+          Text(
             'Core Platform Features',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           _FeatureCard(
             icon: Icons.psychology_alt_outlined,
             iconColor: AppTheme.primary,
-            iconBg: const Color(0xFFEDEBFB),
+            iconBg: AppTheme.primary.withValues(alpha: 0.15),
             title: 'AI-Powered Workflow Breakdown',
             description:
                 'Type any project idea and AI automatically generates the '
                 'milestones, required skills, and duration targets.',
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _FeatureCard(
             icon: Icons.desktop_windows_outlined,
             iconColor: const Color(0xFF00A9E0),
-            iconBg: const Color(0xFFE3F6FD),
+            iconBg: const Color(0xFF00A9E0).withValues(alpha: 0.15),
             title: 'Live Visual Guidance Mode',
             description:
                 'Share your screen remotely and allow mentors or teammates '
                 'to give live guidance and resolve blockers together.',
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _FeatureCard(
             icon: Icons.verified_outlined,
             iconColor: const Color(0xFF1DBF73),
-            iconBg: const Color(0xFFE4F9EE),
+            iconBg: const Color(0xFF1DBF73).withValues(alpha: 0.15),
             title: 'Reputation & Completion Score',
             description:
                 'Every completed job builds your trust score, so you can '
@@ -156,7 +156,7 @@ class _FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
-      shadowColor: Colors.black12,
+      shadowColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -172,10 +172,10 @@ class _FeatureCard extends StatelessWidget {
               ),
               child: Icon(icon, color: iconColor),
             ),
-            const SizedBox(height: 14),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 6),
-            Text(description, style: const TextStyle(color: Colors.black54, height: 1.4)),
+            SizedBox(height: 14),
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: 6),
+            Text(description, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.4)),
           ],
         ),
       ),

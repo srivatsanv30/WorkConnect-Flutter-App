@@ -137,8 +137,8 @@ class _NotificationBellState extends State<_NotificationBell> {
               ),
               child: Text(
                 '$_unreadCount',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).cardColor,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),

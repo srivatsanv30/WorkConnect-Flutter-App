@@ -11,9 +11,9 @@ router.get('/me', requireAuth, async (req, res) => {
   res.json({ user });
 });
 
-// PUT /api/users/me  (update profile: skills, bio, availability)
+// PUT /api/users/me  (update profile: skills, bio, title, phone, location, availability)
 router.put('/me', requireAuth, async (req, res) => {
-  const { name, skills, bio, availability } = req.body;
+  const { name, skills, bio, title, phone, location, availability } = req.body;
 
   const user = await User.findByIdAndUpdate(
     req.userId,
@@ -21,6 +21,9 @@ router.put('/me', requireAuth, async (req, res) => {
       ...(name !== undefined && { name }),
       ...(skills !== undefined && { skills }),
       ...(bio !== undefined && { bio }),
+      ...(title !== undefined && { title }),
+      ...(phone !== undefined && { phone }),
+      ...(location !== undefined && { location }),
       ...(availability !== undefined && { availability }),
     },
     { new: true }

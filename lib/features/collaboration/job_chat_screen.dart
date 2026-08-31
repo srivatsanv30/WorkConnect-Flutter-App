@@ -110,16 +110,16 @@ class _JobChatScreenState extends State<JobChatScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Workspace Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+              Text('Workspace Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
               ListTile(
-                leading: const Icon(Icons.notifications_off_outlined),
-                title: const Text('Mute Notifications'),
+                leading: Icon(Icons.notifications_off_outlined),
+                title: Text('Mute Notifications'),
                 trailing: Switch(value: false, onChanged: (val) {}),
               ),
               ListTile(
-                leading: const Icon(Icons.folder_shared_outlined),
-                title: const Text('Shared Files'),
+                leading: Icon(Icons.folder_shared_outlined),
+                title: Text('Shared Files'),
                 onTap: () => Navigator.pop(ctx),
               ),
             ],
@@ -144,7 +144,7 @@ class _JobChatScreenState extends State<JobChatScreen> {
         title: Text(widget.jobTitle, overflow: TextOverflow.ellipsis),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_outlined),
+            icon: Icon(Icons.settings_outlined),
             onPressed: _showSettings,
           )
         ],
@@ -153,13 +153,13 @@ class _JobChatScreenState extends State<JobChatScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : _messages.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No messages yet.\nSay hello to get started!',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black45),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
                         ),
                       )
                     : ListView.builder(
@@ -203,14 +203,14 @@ class _JobChatScreenState extends State<JobChatScreen> {
                         child: GestureDetector(
                           onTap: _clearImage,
                           child: Container(
-                            color: Colors.black54,
-                            child: const Icon(Icons.close, color: Colors.white, size: 16),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                            child: Icon(Icons.close, color: Theme.of(context).cardColor, size: 16),
                           ),
                         ),
                       )
                     ],
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   const Expanded(child: Text('Image attached', style: TextStyle(fontWeight: FontWeight.bold))),
                 ],
               ),
@@ -221,7 +221,7 @@ class _JobChatScreenState extends State<JobChatScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.image_outlined, color: AppTheme.primary),
+                    icon: Icon(Icons.image_outlined, color: AppTheme.primary),
                     onPressed: _pickImage,
                   ),
                   Expanded(
@@ -234,14 +234,14 @@ class _JobChatScreenState extends State<JobChatScreen> {
                       onSubmitted: (_) => _handleSend(),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Container(
                     decoration: const BoxDecoration(
                       gradient: AppTheme.logoGradient,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                      icon: Icon(Icons.send, color: Theme.of(context).cardColor, size: 20),
                       onPressed: _handleSend,
                     ),
                   ),
@@ -298,14 +298,14 @@ class _ChatBubble extends StatelessWidget {
                   child: Image.memory(
                     base64Decode(imageUrl!.split(',').last),
                     fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, stack) => const Icon(Icons.broken_image, color: Colors.grey),
+                    errorBuilder: (ctx, err, stack) => Icon(Icons.broken_image, color: Colors.grey),
                   ),
                 ),
               ),
             if (text.isNotEmpty)
               Text(
                 text,
-                style: TextStyle(color: isMe ? Colors.white : Colors.black87, fontSize: 14),
+                style: TextStyle(color: isMe ? Colors.white : Theme.of(context).colorScheme.onSurface, fontSize: 14),
               ),
           ],
         ),

@@ -35,24 +35,24 @@ class StatCard extends StatelessWidget {
               ),
               child: Icon(icon, color: iconColor, size: 20),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               value,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: Colors.black54,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                 letterSpacing: 0.5,
               ),
             ),
             Text(
               sublabel,
-              style: const TextStyle(fontSize: 11, color: Colors.black38),
+              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
             ),
           ],
         ),

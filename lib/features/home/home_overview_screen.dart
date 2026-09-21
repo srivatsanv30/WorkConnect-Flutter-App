@@ -1708,7 +1708,7 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           )
         else
           SizedBox(
-            height: 260,
+            height: 215,
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               scrollDirection: Axis.horizontal,
@@ -1934,9 +1934,15 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'View Details',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : AppTheme.primary,
+                    ),
                   ),
                 ),
               ),

@@ -258,17 +258,16 @@ class _MenuRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color iconColor;
 
   const _MenuRow({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.iconColor = AppTheme.primary,
   });
 
   @override
   Widget build(BuildContext context) {
+    const iconColor = AppTheme.primary;
     return InkWell(
       onTap: onTap,
       child: Padding(

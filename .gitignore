@@ -8,5 +8,6 @@ build/
 .vscode/
 ios/Pods/
 android/.gradle/
+android/app/bin/
 src/config/serviceAccountKey.json
 .env.example

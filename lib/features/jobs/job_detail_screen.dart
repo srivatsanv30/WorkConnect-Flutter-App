@@ -98,6 +98,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     });
   }
 
+  Future<void> _refreshJobDetails() async {
+    final jobId = widget.job['_id'];
+    if (jobId == null) return;
+    
+    final result = await _jobService.fetchJobById(jobId.toString());
+    if (mounted && result.success && result.job != null) {
+      setState(() {
+        widget.job.clear();
+        widget.job.addAll(result.job!);
+      });
+    }
+  }
+
   void _showUploadProgressDialog(String jobId) {
     final descController = TextEditingController();
     File? selectedImage;
@@ -301,7 +314,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 const SizedBox(width: 8),
               ],
               ChoiceChip(
-                label: const Text('Submit for Review'),
+                label: const Text('Submit for Review', style: TextStyle(color: Colors.white)),
                 selected: status == 'Review',
                 onSelected: _isUpdatingStatus ? null : (_) => _updateStatus('Review'),
               ),
@@ -352,7 +365,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Progress Updates & Evidence', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text('Progress Updates', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -370,6 +383,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
           itemCount: updates.length,
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
@@ -536,13 +550,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(action == 'request_changes' ? 'Request Changes' : 'Approve Work'),
         content: TextField(
           controller: feedbackController,
           maxLines: 3,
-          decoration: const InputDecoration(
+          minLines: 1,
+          decoration: InputDecoration(
             hintText: 'Add feedback or comments...',
-            border: OutlineInputBorder(),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
         ),
         actions: [
@@ -754,21 +773,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         actions: [
           if (isCreator)
             IconButton(
-              icon: Icon(Icons.delete_outline, color: Theme.of(context).cardColor),
+              icon: const Icon(Icons.delete_outline, color: Colors.white),
               onPressed: _showDeleteDialog,
             )
           else
             IconButton(
-              icon: Icon(Icons.visibility_off_outlined, color: Theme.of(context).cardColor),
+              icon: const Icon(Icons.visibility_off_outlined, color: Colors.white),
               onPressed: _showHideDialog,
             ),
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: RefreshIndicator(
+        onRefresh: _refreshJobDetails,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Hero Header
             Container(
               padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + kToolbarHeight + 16, 24, 32),
@@ -796,24 +817,24 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                         child: Text(
                           priority.toUpperCase(),
-                          style: TextStyle(fontSize: 11, color: Theme.of(context).cardColor, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           status.toUpperCase(),
-                          style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          style: const TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Text(title, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).cardColor, height: 1.2)),
+                  Text(title, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, height: 1.2)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -886,7 +907,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           child: OutlinedButton.icon(
                             onPressed: () => _showUploadProgressDialog(jobId),
                             icon: const Icon(Icons.cloud_upload_outlined, size: 18),
-                            label: const Text('Upload Progress', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            label: Text('Upload Progress', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.primary)),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppTheme.primary,
                               side: const BorderSide(color: AppTheme.primary),
@@ -1136,9 +1157,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: status == 'Review' ? const Color(0xFFFFF8E1) : const Color(0xFFF0FDF4),
+                        color: status == 'Review'
+                            ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : AppTheme.primary.withValues(alpha: 0.1))
+                            : (Theme.of(context).brightness == Brightness.dark ? Colors.green.withValues(alpha: 0.1) : const Color(0xFFF0FDF4)),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: status == 'Review' ? Colors.orange.shade200 : const Color(0xFF86EFAC)),
+                        border: Border.all(
+                            color: status == 'Review'
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : AppTheme.primary.withValues(alpha: 0.3))
+                                : (Theme.of(context).brightness == Brightness.dark ? Colors.green.withValues(alpha: 0.3) : const Color(0xFF86EFAC))),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1147,13 +1173,21 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             children: [
                               Icon(
                                 status == 'Review' ? Icons.rate_review : Icons.verified_outlined,
-                                color: status == 'Review' ? Colors.orange : const Color(0xFF16A34A),
+                                color: status == 'Review'
+                                    ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade300 : AppTheme.primary)
+                                    : const Color(0xFF16A34A),
                                 size: 22,
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 status == 'Review' ? 'Review Submitted Work' : 'Complete Project',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: status == 'Review'
+                                      ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.primary)
+                                      : (Theme.of(context).brightness == Brightness.dark ? Colors.green.shade300 : Colors.green.shade900),
+                                ),
                               ),
                             ],
                           ),
@@ -1163,7 +1197,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 ? 'The collaborator has submitted work for your review. You can request changes or approve and complete the project.'
                                 : 'Ready to wrap up? Complete the project and rate your collaborator to reward XP and boost their trust score.',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: status == 'Review'
+                                  ? (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade400 : AppTheme.primary.withValues(alpha: 0.8))
+                                  : (Theme.of(context).brightness == Brightness.dark ? Colors.green.shade200 : Colors.green.shade900.withValues(alpha: 0.8)),
                               fontSize: 13,
                             ),
                           ),
@@ -1276,6 +1312,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

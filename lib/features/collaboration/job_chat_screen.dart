@@ -209,7 +209,9 @@ class _JobChatScreenState extends State<JobChatScreen> {
           if (_selectedImage != null)
             Container(
               padding: const EdgeInsets.all(8),
-              color: Colors.grey.shade200,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade200,
               child: Row(
                 children: [
                   Stack(
@@ -293,7 +295,11 @@ class _ChatBubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
         decoration: BoxDecoration(
-          color: isMe ? AppTheme.primary : const Color(0xFFF2F2F7),
+          color: isMe
+              ? AppTheme.primary
+              : (Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : const Color(0xFFF2F2F7)),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(

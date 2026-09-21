@@ -79,6 +79,31 @@ class JobService {
     }
   }
 
+  Future<JobResult> fetchJobById(String jobId) async {
+    try {
+      final token = await AuthService().getToken();
+      final headers = <String, String>{};
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId'),
+        headers: headers,
+      );
+      
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      
+      if (response.statusCode == 200) {
+        return JobResult(success: true, job: data['job']);
+      } else {
+        return JobResult(success: false, errorMessage: data['message'] ?? 'Failed to fetch job');
+      }
+    } catch (e) {
+      return JobResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
   Future<JobResult> assignApplicant(String jobId, String applicantId) async {
     final token = await AuthService().getToken();
     if (token == null) {

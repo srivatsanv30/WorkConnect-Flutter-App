@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// A calm healthcare-friendly palette with teal/blue gradients,
 /// soft surfaces, and modern field/button treatments.
@@ -38,11 +39,16 @@ class AppTheme {
         brightness: Brightness.light,
         secondary: secondary,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black87,
         centerTitle: false,
+        titleTextStyle: GoogleFonts.dmSans(
+          color: Colors.black87,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 6,
@@ -68,18 +74,24 @@ class AppTheme {
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: primary.withAlpha(217), width: 1.5),
         ),
-        hintStyle: const TextStyle(color: Colors.black45, fontSize: 14),
+        hintStyle: GoogleFonts.dmSans(color: Colors.black45, fontSize: 14),
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       ),
-      textTheme: ThemeData.light().textTheme.apply(
-            bodyColor: Colors.black87,
-            displayColor: Colors.black87,
-          ),
+      textTheme: GoogleFonts.dmSansTextTheme(
+        ThemeData.light().textTheme,
+      ).apply(
+        bodyColor: Colors.black87,
+        displayColor: Colors.black87,
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -90,6 +102,10 @@ class AppTheme {
           side: BorderSide(color: primary.withAlpha(56)),
           foregroundColor: primaryDark,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -114,11 +130,16 @@ class AppTheme {
         brightness: Brightness.dark,
         secondary: secondary,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
         centerTitle: false,
+        titleTextStyle: GoogleFonts.dmSans(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 6,
@@ -144,18 +165,24 @@ class AppTheme {
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide(color: primary.withAlpha(217), width: 1.5),
         ),
-        hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+        hintStyle: GoogleFonts.dmSans(color: Colors.white54, fontSize: 14),
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       ),
-      textTheme: ThemeData.dark().textTheme.apply(
-            bodyColor: Colors.white,
-            displayColor: Colors.white,
-          ),
+      textTheme: GoogleFonts.dmSansTextTheme(
+        ThemeData.dark().textTheme,
+      ).apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -166,6 +193,10 @@ class AppTheme {
           side: BorderSide(color: primary.withAlpha(100)),
           foregroundColor: primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

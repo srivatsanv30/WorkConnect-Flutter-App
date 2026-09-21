@@ -1,6 +1,8 @@
 const express = require('express');
 const Job = require('../models/Job');
+const User = require('../models/User');
 const requireAuth = require('../middleware/requireAuth');
+const { sendNotificationToUser } = require('../utils/sendNotification');
 const router = express.Router();
 function isParticipant(job, userId) {
   const isCreator = job.creator.toString() === userId;
@@ -27,7 +29,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to update status', error: err.message });
   }
 });
-// POST /api/jobs/:id/milestones  (add a milestone)
+// POST /api/jobs/:id/milestones  (add a milestone - creator only)
 router.post('/:id/milestones', requireAuth, async (req, res) => {
   try {
     const { title } = req.body;
@@ -36,8 +38,8 @@ router.post('/:id/milestones', requireAuth, async (req, res) => {
     }
     const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: 'Job not found' });
-    if (!isParticipant(job, req.userId)) {
-      return res.status(403).json({ message: 'Not authorized' });
+    if (job.creator.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the project creator can manage milestones' });
     }
     job.milestones.push({ title: title.trim(), done: false });
     await job.save();
@@ -46,13 +48,13 @@ router.post('/:id/milestones', requireAuth, async (req, res) => {
     res.status(500).json({ message: 'Failed to add milestone', error: err.message });
   }
 });
-// PATCH /api/jobs/:id/milestones/:milestoneId  (toggle done)
+// PATCH /api/jobs/:id/milestones/:milestoneId  (toggle done - creator only)
 router.patch('/:id/milestones/:milestoneId', requireAuth, async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: 'Job not found' });
-    if (!isParticipant(job, req.userId)) {
-      return res.status(403).json({ message: 'Not authorized' });
+    if (job.creator.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the project creator can manage milestones' });
     }
     const milestone = job.milestones.id(req.params.milestoneId);
     if (!milestone) return res.status(404).json({ message: 'Milestone not found' });
@@ -61,6 +63,101 @@ router.patch('/:id/milestones/:milestoneId', requireAuth, async (req, res) => {
     res.json({ job });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update milestone', error: err.message });
+  }
+});
+
+// POST /api/jobs/:id/progress  (assignee uploads progress update)
+router.post('/:id/progress', requireAuth, async (req, res) => {
+  try {
+    const { description, imageUrl } = req.body;
+    if (!description || !description.trim()) {
+      return res.status(400).json({ message: 'description is required' });
+    }
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    if (!job.assignedTo || job.assignedTo.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the assigned collaborator can submit progress updates' });
+    }
+    if (!job.progressUpdates) job.progressUpdates = [];
+    job.progressUpdates.push({
+      description: description.trim(),
+      imageUrl: imageUrl || null,
+      submittedAt: new Date(),
+      submittedBy: req.userId,
+    });
+    await job.save();
+
+    // Send notification to creator
+    try {
+      const submitter = await User.findById(req.userId);
+      const submitterName = submitter ? submitter.name : 'Your collaborator';
+      sendNotificationToUser({
+        userId: job.creator,
+        title: 'New Progress Submitted',
+        body: `${submitterName} submitted a progress update for "${job.title}"`,
+        jobId: job._id,
+      }).catch(err => console.error('Failed to notify creator:', err.message));
+    } catch (_) {}
+
+    const populated = await Job.findById(job._id)
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email')
+      .populate('applicants', 'name email skills');
+    res.status(201).json({ job: populated });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to submit progress update', error: err.message });
+  }
+});
+
+// POST /api/jobs/:id/progress/:updateId/approve  (creator approves progress and marks milestone complete)
+router.post('/:id/progress/:updateId/approve', requireAuth, async (req, res) => {
+  try {
+    const { milestoneId } = req.body;
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    // Enforce only creator can approve
+    if (job.creator.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Only the project creator can approve progress updates' });
+    }
+
+    const update = job.progressUpdates.id(req.params.updateId);
+    if (!update) {
+      return res.status(404).json({ message: 'Progress update not found' });
+    }
+
+    update.approved = true;
+    update.approvedAt = new Date();
+
+    // Mark milestone complete if specified or find the first incomplete milestone
+    if (milestoneId) {
+      const milestone = job.milestones.id(milestoneId);
+      if (milestone) milestone.done = true;
+    } else {
+      const nextPending = job.milestones.find(m => !m.done);
+      if (nextPending) nextPending.done = true;
+    }
+
+    await job.save();
+
+    // Send notification to assignee
+    if (job.assignedTo) {
+      sendNotificationToUser({
+        userId: job.assignedTo,
+        title: 'Progress Update Approved!',
+        body: `Your progress update for "${job.title}" has been approved by the creator.`,
+        jobId: job._id,
+      }).catch(err => console.error('Failed to notify assignee:', err.message));
+    }
+
+    const populated = await Job.findById(job._id)
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email')
+      .populate('applicants', 'name email skills');
+
+    res.json({ job: populated });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to approve progress update', error: err.message });
   }
 });
 
@@ -90,7 +187,6 @@ router.post('/:id/complete-review', requireAuth, async (req, res) => {
     await job.save();
 
     // Update the collaborator's rating average and count
-    const User = require('../models/User');
     const collaborator = await User.findById(job.assignedTo);
     if (collaborator) {
       const completedJobs = await Job.find({ assignedTo: job.assignedTo, status: 'Completed' });
@@ -101,6 +197,14 @@ router.post('/:id/complete-review', requireAuth, async (req, res) => {
       collaborator.ratingAverage = ratedJobs.length > 0 ? Number((totalRating / ratedJobs.length).toFixed(1)) : 0;
       await collaborator.save();
     }
+
+    // Send notification to assignee
+    sendNotificationToUser({
+      userId: job.assignedTo,
+      title: 'Project Completed!',
+      body: `"${job.title}" has been marked as Completed with a ${rating ?? 5}-star review.`,
+      jobId: job._id,
+    }).catch(err => console.error('Failed to notify collaborator on completion:', err.message));
 
     const populated = await Job.findById(job._id)
       .populate('creator', 'name email')

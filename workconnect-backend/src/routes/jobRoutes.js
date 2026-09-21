@@ -1,7 +1,7 @@
 const express = require('express');
 const Job = require('../models/Job');
 const requireAuth = require('../middleware/requireAuth');
-const { notifyMatchingUsers } = require('../utils/sendNotification');
+const { notifyMatchingUsers, sendNotificationToUser } = require('../utils/sendNotification');
 const router = express.Router();
 
 // POST /api/jobs  (create a job — requires login)
@@ -205,6 +205,11 @@ router.post('/:id/complete', requireAuth, async (req, res) => {
     job.status = 'Completed';
     job.completedAt = new Date();
     
+    // Mark all milestones as completed
+    if (Array.isArray(job.milestones)) {
+      job.milestones.forEach(m => { m.done = true; });
+    }
+    
     if (rating) {
       job.rating = rating;
       if (reviewText) job.reviewText = reviewText;
@@ -232,6 +237,16 @@ router.post('/:id/complete', requireAuth, async (req, res) => {
     }
     
     await job.save();
+
+    if (job.assignedTo) {
+      sendNotificationToUser({
+        userId: job.assignedTo,
+        title: 'Project Completed!',
+        body: `"${job.title}" has been marked as Completed with a ${rating ?? 5}-star review.`,
+        jobId: job._id,
+      }).catch(err => console.error('Failed to notify assignee on completion:', err.message));
+    }
+
     res.json({ message: 'Job completed successfully', job });
   } catch (err) {
     res.status(500).json({ message: 'Failed to complete job', error: err.message });

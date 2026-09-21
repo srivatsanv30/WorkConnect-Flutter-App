@@ -86,11 +86,10 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 12),
-            ElevatedButton.icon(
+            const SizedBox(height: 12),
+            ElevatedButton(
               onPressed: widget.onPostProject,
-              icon: Icon(Icons.auto_awesome, size: 18),
-              label: Text('Post New Project'),
+              child: const Text('Post New Project'),
             ),
             SizedBox(height: 20),
             GridView.count(

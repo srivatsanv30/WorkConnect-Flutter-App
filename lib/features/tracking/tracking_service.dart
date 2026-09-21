@@ -84,4 +84,87 @@ class TrackingService {
       return TrackingResult(success: false, errorMessage: 'Could not reach server: $e');
     }
   }
+
+  Future<TrackingResult> submitProgress(String jobId, String description, {String? imageUrl}) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return TrackingResult(success: false, errorMessage: 'You must be logged in.');
+    }
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/progress'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'description': description,
+          if (imageUrl != null) 'imageUrl': imageUrl,
+        }),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return TrackingResult(success: true, job: data['job']);
+      }
+      return TrackingResult(success: false, errorMessage: data['message'] ?? 'Failed to submit progress update');
+    } catch (e) {
+      return TrackingResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<TrackingResult> approveProgress(String jobId, String updateId, {String? milestoneId}) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return TrackingResult(success: false, errorMessage: 'You must be logged in.');
+    }
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/progress/$updateId/approve'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          if (milestoneId != null) 'milestoneId': milestoneId,
+        }),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return TrackingResult(success: true, job: data['job']);
+      }
+      return TrackingResult(success: false, errorMessage: data['message'] ?? 'Failed to approve progress');
+    } catch (e) {
+      return TrackingResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
+
+  Future<TrackingResult> completeReview(String jobId, double rating, String reviewText) async {
+    final token = await AuthService().getToken();
+    if (token == null) {
+      return TrackingResult(success: false, errorMessage: 'You must be logged in.');
+    }
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/jobs/$jobId/complete-review'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'rating': rating,
+          'reviewText': reviewText,
+        }),
+      );
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return TrackingResult(success: true, job: data['job']);
+      }
+      return TrackingResult(success: false, errorMessage: data['message'] ?? 'Failed to complete review');
+    } catch (e) {
+      return TrackingResult(success: false, errorMessage: 'Could not reach server: $e');
+    }
+  }
 }

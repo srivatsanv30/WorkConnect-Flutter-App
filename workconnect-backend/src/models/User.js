@@ -21,14 +21,18 @@ const userSchema = new mongoose.Schema(
     xp: { type: Number, default: 0 },
     projectsCompleted: { type: Number, default: 0 },
     hiddenJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+    resetOtp: { type: String, default: null },
+    resetOtpExpires: { type: Date, default: null },
   },
   { timestamps: true }
 );
 
-// Never send the hash back in API responses
+// Never send the hash or OTP back in API responses
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.passwordHash;
+  delete obj.resetOtp;
+  delete obj.resetOtpExpires;
   return obj;
 };
 

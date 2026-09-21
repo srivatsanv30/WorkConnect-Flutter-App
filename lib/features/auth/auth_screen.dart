@@ -21,6 +21,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _skillsController = TextEditingController();
+  final _otpController = TextEditingController();
 
   final _authService = AuthService();
   bool _isLoading = false;
@@ -28,6 +29,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String? _infoMessage;
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool _otpSent = false;
   final _confirmPasswordController = TextEditingController();
 
   @override
@@ -37,6 +39,7 @@ class _AuthScreenState extends State<AuthScreen> {
     _passwordController.dispose();
     _skillsController.dispose();
     _confirmPasswordController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
@@ -45,21 +48,78 @@ class _AuthScreenState extends State<AuthScreen> {
       _mode = mode;
       _errorMessage = null;
       _infoMessage = null;
+      _otpSent = false;
+      _otpController.clear();
     });
   }
 
   Future<void> _handleSubmit() async {
     if (_mode == _AuthMode.forgotPassword) {
-      if (_emailController.text.trim().isEmpty) {
+      final email = _emailController.text.trim();
+      if (email.isEmpty) {
         setState(() => _errorMessage = 'Enter your email address');
         return;
       }
-      setState(() {
-        _infoMessage =
-            'Password reset isn\'t wired up yet — this needs an email/OTP backend endpoint.';
-        _errorMessage = null;
-      });
-      return;
+
+      if (!_otpSent) {
+        setState(() {
+          _isLoading = true;
+          _errorMessage = null;
+          _infoMessage = null;
+        });
+
+        final res = await _authService.forgotPassword(email);
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          if (res['success'] == true) {
+            _otpSent = true;
+            _infoMessage = res['message'] ?? 'Verification code generated!';
+            if (res['devOtp'] != null) {
+              _otpController.text = res['devOtp'].toString();
+            }
+          } else {
+            _errorMessage = res['errorMessage'];
+          }
+        });
+        return;
+      } else {
+        final otp = _otpController.text.trim();
+        final newPassword = _passwordController.text;
+        if (otp.isEmpty) {
+          setState(() => _errorMessage = 'Please enter the 6-digit verification code');
+          return;
+        }
+        if (newPassword.length < 6) {
+          setState(() => _errorMessage = 'Password must be at least 6 characters');
+          return;
+        }
+
+        setState(() {
+          _isLoading = true;
+          _errorMessage = null;
+          _infoMessage = null;
+        });
+
+        final res = await _authService.resetPassword(
+          email: email,
+          otp: otp,
+          newPassword: newPassword,
+        );
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          if (res['success'] == true) {
+            _switchMode(_AuthMode.signIn);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(res['message'] ?? 'Password reset successfully! Please sign in.')),
+            );
+          } else {
+            _errorMessage = res['errorMessage'];
+          }
+        });
+        return;
+      }
     }
 
     if (!_formKey.currentState!.validate()) return;
@@ -105,7 +165,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final title = switch (_mode) {
       _AuthMode.signIn => 'Sign in to your account',
       _AuthMode.signUp => 'Create your secure profile',
-      _AuthMode.forgotPassword => 'Reset your password',
+      _AuthMode.forgotPassword => _otpSent ? 'Enter code & new password' : 'Reset your password',
     };
 
     final subtitle = switch (_mode) {
@@ -113,8 +173,9 @@ class _AuthScreenState extends State<AuthScreen> {
         'Access your Task dashboard,teams and task updates securely.',
       _AuthMode.signUp =>
         'Register with your details to connect with Workers,Freelancers and workflows.',
-      _AuthMode.forgotPassword =>
-        'Enter your account email and we will send a reset link when available.',
+      _AuthMode.forgotPassword => _otpSent
+          ? 'Enter the 6-digit code sent to your email and your new password.'
+          : 'Enter your account email to receive a verification code.',
     };
 
     final switchPrompt = switch (_mode) {
@@ -146,33 +207,50 @@ class _AuthScreenState extends State<AuthScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: const BoxDecoration(
-                            color: Colors.white24,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.logoGradient,
                             shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primary.withAlpha(70),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: Icon(
-                            Icons.medical_services_rounded,
+                          child: const Icon(
+                            Icons.people_alt_rounded,
                             color: Colors.white,
-                            size: 30,
+                            size: 28,
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(56),
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor.withAlpha(30),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.shadow.withAlpha(12),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Row(
-                            children: const [
-                              Icon(Icons.lock_outline, color: Colors.white, size: 16),
-                              SizedBox(width: 6),
+                            children: [
+                              const Icon(Icons.shield_outlined, color: AppTheme.primary, size: 16),
+                              const SizedBox(width: 6),
                               Text(
                                 'Secure access',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -201,9 +279,17 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 24),
                     Row(
                       children: const [
-                        _HeaderBadge(label: 'Easy Collab', icon: Icons.access_time_rounded),
+                        _HeaderBadge(
+                          label: 'Easy Collab',
+                          icon: Icons.groups_rounded,
+                          iconColor: AppTheme.primary,
+                        ),
                         SizedBox(width: 12),
-                        _HeaderBadge(label: 'Live updates', icon: Icons.health_and_safety_rounded),
+                        _HeaderBadge(
+                          label: 'Live updates',
+                          icon: Icons.bolt_rounded,
+                          iconColor: Color(0xFF1DBF73),
+                        ),
                       ],
                     ),
                   ],
@@ -319,6 +405,36 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             ],
 
+                            if (_mode == _AuthMode.forgotPassword && _otpSent) ...[
+                              const SizedBox(height: 14),
+                              _RoundedField(
+                                controller: _otpController,
+                                icon: Icons.pin_outlined,
+                                hint: '6-digit verification code',
+                                keyboardType: TextInputType.number,
+                              ),
+                              const SizedBox(height: 14),
+                              _RoundedField(
+                                controller: _passwordController,
+                                icon: Icons.lock_outline,
+                                hint: 'New password',
+                                obscureText: _obscurePassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    color: AppTheme.primary,
+                                    size: 20,
+                                  ),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                ),
+                                validator: (v) {
+                                  if (v == null || v.isEmpty) return 'New password is required';
+                                  if (v.length < 6) return 'Use at least 6 characters';
+                                  return null;
+                                },
+                              ),
+                            ],
+
                             if (_mode == _AuthMode.signIn) ...[
                               const SizedBox(height: 8),
                               Align(
@@ -394,9 +510,10 @@ class _AuthScreenState extends State<AuthScreen> {
                                         switch (_mode) {
                                           _AuthMode.signIn => 'Login',
                                           _AuthMode.signUp => 'Create Account',
-                                          _AuthMode.forgotPassword => 'Send OTP',
+                                          _AuthMode.forgotPassword =>
+                                            _otpSent ? 'Reset Password' : 'Send Verification Code',
                                         },
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -573,27 +690,44 @@ class _ModeTab extends StatelessWidget {
 class _HeaderBadge extends StatelessWidget {
   final String label;
   final IconData icon;
+  final Color iconColor;
 
   const _HeaderBadge({
     required this.label,
     required this.icon,
+    this.iconColor = AppTheme.primary,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-        color: Colors.white.withAlpha(56),
-        borderRadius: BorderRadius.circular(18),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withAlpha(25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withAlpha(10),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white, size: 16),
+          Icon(icon, color: iconColor, size: 16),
           const SizedBox(width: 8),
           Text(
             label,
-            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

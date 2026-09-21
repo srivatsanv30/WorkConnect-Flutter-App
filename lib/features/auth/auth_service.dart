@@ -17,12 +17,24 @@ class AuthResult {
 /// JWT locally so the user stays logged in between app launches.
 class AuthService {
   static const _tokenKey = 'wc_auth_token';
+  static const _userIdKey = 'wc_user_id';
+  static const _userDataKey = 'wc_user_data';
+
   Future<String?> getCurrentUserId() async {
-  // We don't store the user object, only the token — decode isn't needed
-  // since job_detail_screen already has creator/assignedTo IDs to compare.
-  // This is a placeholder for now; wire it from MainShell's user object instead.
-  return null;
-}
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userIdKey);
+  }
+
+  Future<AppUser?> getCurrentUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userJson = prefs.getString(_userDataKey);
+      if (userJson != null) {
+        return AppUser.fromJson(jsonDecode(userJson));
+      }
+    } catch (_) {}
+    return null;
+  }
 
   Future<AuthResult> signup({
     required String name,
@@ -44,6 +56,61 @@ class AuthService {
       endpoint: '/auth/login',
       body: {'email': email, 'password': password},
     );
+  }
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/auth/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'OTP sent',
+          'devOtp': data['devOtp'],
+        };
+      }
+      return {
+        'success': false,
+        'errorMessage': data['message'] ?? 'Failed to generate code',
+      };
+    } catch (e) {
+      return {'success': false, 'errorMessage': 'Could not reach server: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/auth/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'newPassword': newPassword,
+        }),
+      );
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Password reset successful',
+        };
+      }
+      return {
+        'success': false,
+        'errorMessage': data['message'] ?? 'Failed to reset password',
+      };
+    } catch (e) {
+      return {'success': false, 'errorMessage': 'Could not reach server: $e'};
+    }
   }
 
   Future<AuthResult> updateProfile({
@@ -103,8 +170,8 @@ class AuthService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final token = data['token'] as String;
-        await _saveToken(token);
         final user = AppUser.fromJson(data['user']);
+        await _saveAuthData(token: token, user: user, userJson: jsonEncode(data['user']));
         return AuthResult(success: true, user: user);
       } else {
         return AuthResult(success: false, errorMessage: data['message'] ?? 'Request failed');
@@ -114,9 +181,15 @@ class AuthService {
     }
   }
 
-  Future<void> _saveToken(String token) async {
+  Future<void> _saveAuthData({
+    required String token,
+    required AppUser user,
+    required String userJson,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
+    await prefs.setString(_userIdKey, user.id);
+    await prefs.setString(_userDataKey, userJson);
   }
 
   Future<String?> getToken() async {
@@ -127,5 +200,7 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+    await prefs.remove(_userIdKey);
+    await prefs.remove(_userDataKey);
   }
 }

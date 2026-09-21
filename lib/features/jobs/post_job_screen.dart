@@ -176,16 +176,18 @@ class _PostJobScreenState extends State<PostJobScreen> {
                   SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: _isBreakingDown ? null : _handleAiBreakdown,
-                      icon: _isBreakingDown
+                      child: _isBreakingDown
                           ? SizedBox(
-                              height: 14,
-                              width: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
+                              height: 16,
+                              width: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Theme.of(context).cardColor,
+                              ),
                             )
-                          : Icon(Icons.auto_fix_high, size: 16),
-                      label: Text(_isBreakingDown ? 'Thinking...' : 'Breakdown'),
+                          : const Text('Breakdown'),
                     ),
                   ),
                 ],

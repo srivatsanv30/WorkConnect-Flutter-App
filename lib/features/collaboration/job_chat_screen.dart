@@ -10,12 +10,14 @@ class JobChatScreen extends StatefulWidget {
   final String jobId;
   final String jobTitle;
   final String currentUserId;
+  final String? recipientName;
 
   const JobChatScreen({
     super.key,
     required this.jobId,
     required this.jobTitle,
     required this.currentUserId,
+    this.recipientName,
   });
   @override
   State<JobChatScreen> createState() => _JobChatScreenState();
@@ -141,7 +143,26 @@ class _JobChatScreenState extends State<JobChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobTitle, overflow: TextOverflow.ellipsis),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.recipientName != null ? widget.recipientName! : widget.jobTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (widget.recipientName != null)
+              Text(
+                widget.jobTitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.settings_outlined),

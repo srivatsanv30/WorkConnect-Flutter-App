@@ -29,6 +29,16 @@ const jobSchema = new mongoose.Schema(
     reviewText: { type: String, default: null },
     completedAt: { type: Date, default: null },
     reviewComments: { type: [String], default: [] },
+    progressUpdates: [
+      {
+        description: { type: String, required: true },
+        imageUrl: { type: String, default: null },
+        submittedAt: { type: Date, default: Date.now },
+        submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        approved: { type: Boolean, default: false },
+        approvedAt: { type: Date, default: null },
+      },
+    ],
   },
   { timestamps: true }
 );

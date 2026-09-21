@@ -14,12 +14,55 @@ router.post('/breakdown', requireAuth, async (req, res) => {
     }
 
     if (!process.env.GEMINI_API_KEY) {
-      // Mock response if API key is missing
+      // Smart mock response if API key is missing
+      const lowerIdea = idea.toLowerCase();
+      let skills = ["React", "Node.js", "MongoDB"];
+      let milestones = [
+        "Setup project repository and architecture",
+        "Implement user authentication and authorization",
+        "Build the core user interface",
+        "Integrate backend APIs and database",
+        "Perform testing and deploy to production"
+      ];
+      let desc = "A full-stack application built to deliver a seamless user experience.";
+
+      if (lowerIdea.includes('chat') || lowerIdea.includes('messag')) {
+        skills = ["Flutter", "Firebase", "WebSockets"];
+        milestones = [
+          "Setup Firebase project and authentication",
+          "Design real-time chat UI",
+          "Implement WebSocket/Firestore real-time listeners",
+          "Add push notifications for new messages",
+          "Test edge cases and deploy"
+        ];
+        desc = "A real-time communication platform allowing instant messaging between users.";
+      } else if (lowerIdea.includes('shop') || lowerIdea.includes('ecommerce') || lowerIdea.includes('store')) {
+        skills = ["Next.js", "Stripe", "PostgreSQL"];
+        milestones = [
+          "Build product catalog and search UI",
+          "Implement shopping cart state management",
+          "Integrate Stripe for secure checkout",
+          "Build admin dashboard for order management",
+          "Deploy and optimize SEO"
+        ];
+        desc = "An e-commerce storefront with a secure checkout flow and product management.";
+      } else if (lowerIdea.includes('task') || lowerIdea.includes('todo') || lowerIdea.includes('manage')) {
+        skills = ["Vue.js", "Express", "SQLite"];
+        milestones = [
+          "Design Kanban board or list UI",
+          "Implement CRUD operations for tasks",
+          "Add drag-and-drop functionality",
+          "Implement user roles and task assignment",
+          "Finalize testing and deploy"
+        ];
+        desc = "A productivity tool to organize tasks, track progress, and manage daily workflows.";
+      }
+
       return res.json({
-        title: idea.length > 20 ? idea.substring(0, 20) + "..." : idea,
-        description: "This is a mock project breakdown. Add a valid GEMINI_API_KEY to your .env file to get real AI-generated project plans.",
-        skillsRequired: ["Flutter", "Node.js", "MongoDB"],
-        milestones: ["Setup project structure", "Implement authentication", "Build core UI", "Integrate APIs", "Testing and deployment"]
+        title: idea.length > 30 ? idea.substring(0, 30) + "..." : idea,
+        description: desc + " (Mocked by AI Smart Fallback)",
+        skillsRequired: skills,
+        milestones: milestones
       });
     }
 

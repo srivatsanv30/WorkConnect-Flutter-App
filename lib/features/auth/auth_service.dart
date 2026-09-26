@@ -146,6 +146,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final user = AppUser.fromJson(data['user']);
+        await _saveAuthData(token: token, user: user, userJson: jsonEncode(data['user']));
         return AuthResult(success: true, user: user);
       } else {
         return AuthResult(success: false, errorMessage: data['message'] ?? 'Update failed');

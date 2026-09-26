@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/app_theme.dart';
 import '../auth/user_model.dart';
 import '../auth/auth_service.dart';
@@ -20,6 +23,7 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
   late TextEditingController _locationController;
   late TextEditingController _skillsController;
   bool _isSaving = false;
+  File? _profileImage;
 
   @override
   void initState() {
@@ -30,6 +34,47 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
     _phoneController = TextEditingController(text: widget.user?.phone ?? '');
     _locationController = TextEditingController(text: widget.user?.location ?? '');
     _skillsController = TextEditingController(text: widget.user?.skills.join(', ') ?? '');
+    _loadProfileImage();
+    _fetchLatestUserData();
+  }
+
+  Future<void> _fetchLatestUserData() async {
+    final user = await AuthService().getCurrentUser();
+    if (mounted && user != null) {
+      setState(() {
+        _nameController.text = user.name;
+        _titleController.text = user.title;
+        _bioController.text = user.bio;
+        _phoneController.text = user.phone;
+        _locationController.text = user.location;
+        _skillsController.text = user.skills.join(', ');
+      });
+    }
+  }
+
+  Future<void> _loadProfileImage() async {
+    if (widget.user?.id == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final imagePath = prefs.getString('profile_image_${widget.user!.id}');
+    if (imagePath != null && File(imagePath).existsSync()) {
+      setState(() {
+        _profileImage = File(imagePath);
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+      if (widget.user?.id != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('profile_image_${widget.user!.id}', pickedFile.path);
+      }
+    }
   }
 
   @override
@@ -106,43 +151,57 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
             children: [
               // Avatar section
               Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.logoGradient,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        _nameController.text.isNotEmpty ? _nameController.text[0].toUpperCase() : '?',
-                        style: TextStyle(color: Theme.of(context).cardColor, fontSize: 36, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 32,
-                        height: 32,
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 96,
+                        height: 96,
                         decoration: BoxDecoration(
-                          color: AppTheme.primary,
+                          gradient: AppTheme.logoGradient,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).cardColor, width: 2),
+                          image: _profileImage != null
+                              ? DecorationImage(
+                                  image: FileImage(_profileImage!),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
                         ),
-                        child: Icon(Icons.camera_alt, color: Theme.of(context).cardColor, size: 16),
+                        alignment: Alignment.center,
+                        child: _profileImage == null
+                            ? Text(
+                                _nameController.text.isNotEmpty ? _nameController.text[0].toUpperCase() : '?',
+                                style: TextStyle(color: Theme.of(context).cardColor, fontSize: 36, fontWeight: FontWeight.bold),
+                              )
+                            : null,
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Theme.of(context).cardColor, width: 2),
+                          ),
+                          child: Icon(Icons.camera_alt, color: Theme.of(context).cardColor, size: 16),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 8),
               Center(
-                child: Text(
-                  'Tap to change photo',
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Text(
+                    'Tap to change photo',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontSize: 12),
+                  ),
                 ),
               ),
               SizedBox(height: 28),

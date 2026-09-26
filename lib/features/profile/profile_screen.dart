@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/app_theme.dart';
 import '../auth/user_model.dart';
 import '../auth/auth_service.dart';
@@ -10,10 +12,46 @@ import 'reputation_ratings_screen.dart';
 import 'faq_screen.dart';
 import 'report_bug_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final AppUser? user;
 
   const ProfileScreen({super.key, required this.user});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late AppUser? _currentUser;
+  File? _profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = widget.user;
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = await AuthService().getCurrentUser();
+    if (mounted && user != null) {
+      setState(() {
+        _currentUser = user;
+      });
+    }
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    if (_currentUser?.id == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final imagePath = prefs.getString('profile_image_${_currentUser!.id}');
+    if (imagePath != null && File(imagePath).existsSync()) {
+      setState(() {
+        _profileImage = File(imagePath);
+      });
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     await AuthService().logout();
@@ -26,9 +64,9 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = user?.name ?? 'Guest';
-    final email = user?.email ?? '';
-    final skills = user?.skills ?? [];
+    final name = _currentUser?.name ?? 'Guest';
+    final email = _currentUser?.email ?? '';
+    final skills = _currentUser?.skills ?? [];
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return SingleChildScrollView(
@@ -54,22 +92,41 @@ class ProfileScreen extends StatelessWidget {
                         offset: const Offset(0, 8),
                       ),
                     ],
+                    image: _profileImage != null
+                        ? DecorationImage(
+                            image: FileImage(_profileImage!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    initials,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _profileImage == null
+                      ? Text(
+                          initials,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   name,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                 ),
+                if (_currentUser?.title?.isNotEmpty == true) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _currentUser!.title,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 4),
                 Text(
                   email,
@@ -145,8 +202,15 @@ class ProfileScreen extends StatelessWidget {
               _MenuRow(
                 icon: Icons.person_outline,
                 label: 'Manage Profile',
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManageProfileScreen(user: user)));
+                onTap: () async {
+                  final updatedUser = await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => ManageProfileScreen(user: _currentUser))
+                  );
+                  if (updatedUser != null && updatedUser is AppUser) {
+                    setState(() {
+                      _currentUser = updatedUser;
+                    });
+                  }
                 },
               ),
               _MenuRow(
@@ -182,7 +246,7 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.emoji_events_outlined,
                 label: 'Reputation & Ratings',
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReputationRatingsScreen(userId: user?.id)));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReputationRatingsScreen(userId: _currentUser?.id)));
                 },
               ),
               _MenuRow(

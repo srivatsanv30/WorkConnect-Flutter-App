@@ -8,6 +8,7 @@ import '../collaboration/job_chat_screen.dart';
 import '../jobs/job_detail_screen.dart';
 import '../jobs/job_service.dart';
 import '../notification/notification_bell.dart';
+import '../profile/public_profile_screen.dart';
 
 enum DashboardMode { freelancer, client }
 
@@ -42,6 +43,9 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
   bool _showOnlyBookmarked = false;
   String _searchQuery = '';
   String _resolvedUserId = '';
+  
+  List<AppUser> _userSearchResults = [];
+  bool _isSearchingUsers = false;
 
   final List<String> _categories = [
     'All',
@@ -153,6 +157,18 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
       setState(() {
         _errorMessage = 'Could not load jobs. Pull down to retry.';
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _performUserSearch(String query) async {
+    setState(() => _isSearchingUsers = true);
+    final users = await AuthService().searchUsers(query);
+    if (!mounted) return;
+    if (query == _searchQuery) {
+      setState(() {
+        _userSearchResults = users;
+        _isSearchingUsers = false;
       });
     }
   }
@@ -614,7 +630,12 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
       ),
       child: TextField(
         controller: _searchController,
-        onChanged: (value) => setState(() => _searchQuery = value.trim()),
+        onChanged: (value) {
+          setState(() => _searchQuery = value.trim());
+          if (_mode == DashboardMode.client && _searchQuery.isNotEmpty) {
+            _performUserSearch(_searchQuery);
+          }
+        },
         decoration: InputDecoration(
           hintText: _mode == DashboardMode.freelancer
               ? 'Search jobs, skills, or projects...'
@@ -1126,7 +1147,7 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSearchResultsSection(context, searchResults),
+          _buildUserSearchResultsSection(context, _userSearchResults),
           const SizedBox(height: 28),
           _buildRecommendedSection(context, recommendedJobs),
           const SizedBox(height: 40),
@@ -1365,6 +1386,171 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
   // ---------------------------------------------------------------------------
   // SEARCH RESULTS & RECOMMENDED SECTIONS
   // ---------------------------------------------------------------------------
+  Widget _buildUserSearchResultsSection(BuildContext context, List<AppUser> results) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.person_search, size: 20, color: AppTheme.primary),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Talent Search Results',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (_isSearchingUsers)
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${results.length}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              TextButton(
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() => _searchQuery = '');
+                },
+                child: const Text('Clear Search', style: TextStyle(fontSize: 12)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (!_isSearchingUsers && results.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.search_off_rounded,
+                    size: 40,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No talents found matching "$_searchQuery"',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            )
+          else if (!_isSearchingUsers)
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: results.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 14),
+              itemBuilder: (context, index) {
+                final user = results[index];
+                final nameInitials = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
+                            foregroundColor: AppTheme.primary,
+                            child: Text(nameInitials, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                const SizedBox(height: 4),
+                                if (user.title.isNotEmpty)
+                                  Text(user.title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (user.skills.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: user.skills.take(4).map((skill) => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(skill, style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                          )).toList(),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => PublicProfileScreen(user: user)));
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.primary,
+                            side: const BorderSide(color: AppTheme.primary),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: const Text('View Profile & Status'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSearchResultsSection(BuildContext context, List<Map<String, dynamic>> results) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

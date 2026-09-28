@@ -182,6 +182,20 @@ class AuthService {
     }
   }
 
+  Future<List<AppUser>> searchUsers(String query) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}/users?query=$query'),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final usersData = data['users'] as List;
+        return usersData.map((e) => AppUser.fromJson(e)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
   Future<void> _saveAuthData({
     required String token,
     required AppUser user,

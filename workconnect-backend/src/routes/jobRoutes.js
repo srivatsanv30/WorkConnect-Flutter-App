@@ -142,6 +142,23 @@ router.patch('/:id/assign', requireAuth, async (req, res) => {
       .populate('creator', 'name email')
       .populate('assignedTo', 'name email')
       .populate('applicants', 'name email skills');
+
+    // Notify the unselected applicants
+    try {
+      const { sendNotificationToUser } = require('../utils/sendNotification');
+      const otherApplicants = job.applicants.filter(id => id.toString() !== applicantId);
+      for (const id of otherApplicants) {
+        await sendNotificationToUser({
+          userId: id,
+          title: 'Position Filled',
+          body: `The position for "${job.title}" has been filled. Thank you for applying!`,
+          jobId: job._id,
+        }).catch(err => console.error('Failed to notify rejected applicant:', err.message));
+      }
+    } catch (notifErr) {
+      console.error('Failed to send rejection notifications:', notifErr.message);
+    }
+
     res.json({ job: populated });
   } catch (err) {
     res.status(500).json({ message: 'Failed to assign job', error: err.message });

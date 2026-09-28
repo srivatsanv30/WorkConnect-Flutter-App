@@ -70,8 +70,28 @@ router.get('/:id/reputation', async (req, res) => {
   }
 });
 
+// GET /api/users
+router.get('/', async (req, res) => {
+  try {
+    const { query } = req.query;
+    let filter = {};
+    if (query) {
+      filter = {
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { skills: { $regex: query, $options: 'i' } },
+          { title: { $regex: query, $options: 'i' } }
+        ]
+      };
+    }
+    const users = await User.find(filter).select('-password');
+    res.json({ users });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to search users', error: err.message });
+  }
+});
+
 module.exports = router;
-// TEMPORARY DEBUG ROUTE — remove after testing
 router.get('/debug/all', async (req, res) => {
   const users = await User.find({}, 'name email skills fcmToken');
   res.json({ users });

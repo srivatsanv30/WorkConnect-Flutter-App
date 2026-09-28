@@ -1287,26 +1287,63 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ],
 
                   // Applicant view (not creator, not assigned): apply button
-                  if (!isCreator && !hasAssignee)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _isApplying ? null : _handleApply,
-                        icon: _isApplying
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
-                              )
-                            : const Icon(Icons.send_outlined, size: 20),
-                        label: Text(_isApplying ? 'Sending Application...' : 'Apply for this Project',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  if (!isCreator && !isAssignee)
+                    if (hasAssignee)
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Status: Filled',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: null, // Gray out button
+                              icon: const Icon(Icons.send_outlined, size: 20),
+                              label: const Text('Apply for this Project',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                disabledForegroundColor: Colors.grey.shade500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: _isApplying ? null : _handleApply,
+                          icon: _isApplying
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).cardColor),
+                                )
+                              : const Icon(Icons.send_outlined, size: 20),
+                          label: Text(_isApplying ? 'Sending Application...' : 'Apply for this Project',
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
                         ),
                       ),
-                    ),
                 ],
               ),
             ),

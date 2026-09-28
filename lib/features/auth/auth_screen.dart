@@ -310,8 +310,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _AuthModeSelector(mode: _mode, onModeChanged: _switchMode),
-                            const SizedBox(height: 22),
+
                             Text(
                               title,
                               style: TextStyle(

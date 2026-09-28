@@ -113,6 +113,37 @@ class AuthService {
     }
   }
 
+  Future<Map<String, dynamic>> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}/auth/change-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        }),
+      );
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': data['message'] ?? 'Password changed successfully',
+        };
+      }
+      return {
+        'success': false,
+        'errorMessage': data['message'] ?? 'Failed to change password',
+      };
+    } catch (e) {
+      return {'success': false, 'errorMessage': 'Could not reach server: $e'};
+    }
+  }
+
   Future<AuthResult> updateProfile({
     String? name,
     List<String>? skills,

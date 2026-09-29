@@ -311,24 +311,43 @@ class _AuthScreenState extends State<AuthScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
 
+                            if (_mode == _AuthMode.forgotPassword) ...[
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  margin: const EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primary.withAlpha(25),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    _otpSent ? Icons.mark_email_read_rounded : Icons.lock_reset_rounded,
+                                    size: 48,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
                             Text(
                               title,
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: _mode == _AuthMode.forgotPassword ? 24 : 22,
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
+                              textAlign: _mode == _AuthMode.forgotPassword ? TextAlign.center : TextAlign.start,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               subtitle,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
                                 height: 1.5,
                               ),
+                              textAlign: _mode == _AuthMode.forgotPassword ? TextAlign.center : TextAlign.start,
                             ),
-                            const SizedBox(height: 22),
+                            const SizedBox(height: 28),
 
                             if (_mode == _AuthMode.signUp) ...[
                               _RoundedField(

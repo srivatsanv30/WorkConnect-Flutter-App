@@ -1141,7 +1141,6 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
   // ---------------------------------------------------------------------------
   Widget _buildClientView(BuildContext context) {
     final clientJobs = _clientJobs;
-    final searchResults = _searchResults;
     final recommendedJobs = _recommendedJobs;
 
     if (_searchQuery.isNotEmpty) {

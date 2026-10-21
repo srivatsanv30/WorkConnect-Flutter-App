@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   name,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                 ),
-                if (_currentUser?.title?.isNotEmpty == true) ...[
+                if (_currentUser?.title.isNotEmpty == true) ...[
                   const SizedBox(height: 4),
                   Text(
                     _currentUser!.title,

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,14 +54,17 @@ class _ManageProfileScreenState extends State<ManageProfileScreen> {
   }
 
   Future<void> _loadProfileImage() async {
-    if (widget.user?.id == null) return;
-    final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('profile_image_${widget.user!.id}');
-    if (imagePath != null && File(imagePath).existsSync()) {
-      setState(() {
-        _profileImage = File(imagePath);
-      });
-    }
+    if (kIsWeb) return;
+    try {
+      if (widget.user?.id == null) return;
+      final prefs = await SharedPreferences.getInstance();
+      final imagePath = prefs.getString('profile_image_${widget.user!.id}');
+      if (imagePath != null && File(imagePath).existsSync()) {
+        setState(() {
+          _profileImage = File(imagePath);
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _pickImage() async {

@@ -475,45 +475,54 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppTheme.primary,
-                      child: Text(
-                        _displayName.isNotEmpty ? _displayName[0].toUpperCase() : 'U',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                Expanded(
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppTheme.primary,
+                        child: Text(
+                          _displayName.isNotEmpty ? _displayName[0].toUpperCase() : 'U',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Welcome back 👋',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome back 👋',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _displayName,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: -0.5,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _displayName,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 NotificationBell(currentUserId: _currentUserId),
               ],
             ),
@@ -745,38 +754,45 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem(
-              context,
-              icon: Icons.pending_actions_rounded,
-              iconColor: const Color(0xFF00A9E0),
-              value: '$activeCount',
-              label: 'Active',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.pending_actions_rounded,
+                iconColor: const Color(0xFF00A9E0),
+                value: '$activeCount',
+                label: 'Active',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.check_circle_outline,
-              iconColor: const Color(0xFF1DBF73),
-              value: '$completed',
-              label: 'Completed',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.check_circle_outline,
+                iconColor: const Color(0xFF1DBF73),
+                value: '$completed',
+                label: 'Completed',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.star_rounded,
-              iconColor: hasRating ? Colors.amber : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-              value: ratingDisplay,
-              label: 'Rating',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.star_rounded,
+                iconColor: hasRating ? Colors.amber : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                value: ratingDisplay,
+                label: 'Rating',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.military_tech_outlined,
-              iconColor: const Color(0xFF8B5CF6),
-              value: '$xp XP',
-              label: 'Level',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.military_tech_outlined,
+                iconColor: const Color(0xFF8B5CF6),
+                value: '$xp XP',
+                label: 'Level',
+              ),
             ),
           ],
         ),
@@ -793,35 +809,42 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Text(
-                    'Application Tracker',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, letterSpacing: -0.3),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1DBF73).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '${jobs.length} tracked',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1DBF73),
+              Expanded(
+                child: Row(
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        'Application Tracker',
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, letterSpacing: -0.3),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1DBF73).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${jobs.length} tracked',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1DBF73),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => widget.onNavigate(1),
                 child: const Text(
                   'Workspace Hub →',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primary),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primary),
                 ),
               ),
             ],
@@ -1206,38 +1229,45 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem(
-              context,
-              icon: Icons.post_add_rounded,
-              iconColor: AppTheme.primary,
-              value: '$postedCount',
-              label: 'Jobs Posted',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.post_add_rounded,
+                iconColor: AppTheme.primary,
+                value: '$postedCount',
+                label: 'Jobs Posted',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.people_outline_rounded,
-              iconColor: const Color(0xFF00A9E0),
-              value: '$totalApplicants',
-              label: 'Applicants',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.people_outline_rounded,
+                iconColor: const Color(0xFF00A9E0),
+                value: '$totalApplicants',
+                label: 'Applicants',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.hourglass_top_rounded,
-              iconColor: Colors.orange,
-              value: '$inProgress',
-              label: 'In Progress',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.hourglass_top_rounded,
+                iconColor: Colors.orange,
+                value: '$inProgress',
+                label: 'In Progress',
+              ),
             ),
             Container(height: 36, width: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
-            _buildStatItem(
-              context,
-              icon: Icons.check_circle_outline,
-              iconColor: const Color(0xFF1DBF73),
-              value: '$completed',
-              label: 'Completed',
+            Expanded(
+              child: _buildStatItem(
+                context,
+                icon: Icons.check_circle_outline,
+                iconColor: const Color(0xFF1DBF73),
+                value: '$completed',
+                label: 'Completed',
+              ),
             ),
           ],
         ),
@@ -1324,15 +1354,20 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'My Posted Projects',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.3),
+              const Expanded(
+                child: Text(
+                  'My Posted Projects',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, letterSpacing: -0.3),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => widget.onNavigate(1),
                 child: const Text(
                   'Manage All →',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.primary),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primary),
                 ),
               ),
             ],
@@ -1645,40 +1680,47 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Text(
-                    'Recommended Projects',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      'Matched',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8B5CF6),
+              Expanded(
+                child: Row(
+                  children: [
+                    const Flexible(
+                      child: Text(
+                        'Recommended Projects',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        'Matched',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF8B5CF6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => widget.onNavigate(1),
                 child: const Text(
                   'Explore →',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primary,
                   ),
@@ -1752,41 +1794,48 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Text(
-                    'Live Jobs Feed',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (!_isLoading)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+              Expanded(
+                child: Row(
+                  children: [
+                    const Flexible(
                       child: Text(
-                        '${jobs.length}',
-                        style: const TextStyle(
-                          fontSize: 11,
+                        'Live Jobs Feed',
+                        style: TextStyle(
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
+                          letterSpacing: -0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    if (!_isLoading)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${jobs.length}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () => widget.onNavigate(1),
                 child: const Text(
                   'See All',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primary,
                   ),
@@ -2199,28 +2248,43 @@ class _HomeOverviewScreenState extends State<HomeOverviewScreen> {
     required String value,
     required String label,
   }) {
-    return Column(
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: iconColor),
-            const SizedBox(width: 4),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: iconColor),
+              const SizedBox(width: 3),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    maxLines: 1,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+              ),
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

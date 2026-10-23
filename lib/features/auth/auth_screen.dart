@@ -33,6 +33,25 @@ class _AuthScreenState extends State<AuthScreen> {
   final _confirmPasswordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _checkExistingSession();
+  }
+
+  Future<void> _checkExistingSession() async {
+    try {
+      final user = await _authService.getCurrentUser();
+      final token = await _authService.getToken();
+      if (user != null && token != null && mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => MainShell(user: user)),
+          (route) => false,
+        );
+      }
+    } catch (_) {}
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -146,17 +165,22 @@ class _AuthScreenState extends State<AuthScreen> {
           );
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
     if (result.success) {
-      await FcmService().initialize();
-      if (!mounted) return;
+      // Fire-and-forget FCM initialization so it doesn't block navigation or throw unhandled exceptions
+      FcmService().initialize().catchError((e) {
+        debugPrint('FCM initialization error: $e');
+      });
+
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => MainShell(user: result.user)),
         (route) => false,
       );
     } else {
-      setState(() => _errorMessage = result.errorMessage);
+      setState(() {
+        _isLoading = false;
+        _errorMessage = result.errorMessage;
+      });
     }
   }
 

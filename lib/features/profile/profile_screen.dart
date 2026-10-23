@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/app_theme.dart';
@@ -43,14 +44,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadProfileImage() async {
-    if (_currentUser?.id == null) return;
-    final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('profile_image_${_currentUser!.id}');
-    if (imagePath != null && File(imagePath).existsSync()) {
-      setState(() {
-        _profileImage = File(imagePath);
-      });
-    }
+    if (kIsWeb) return;
+    try {
+      if (_currentUser?.id == null) return;
+      final prefs = await SharedPreferences.getInstance();
+      final imagePath = prefs.getString('profile_image_${_currentUser!.id}');
+      if (imagePath != null && File(imagePath).existsSync()) {
+        setState(() {
+          _profileImage = File(imagePath);
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _logout(BuildContext context) async {

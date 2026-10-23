@@ -17,7 +17,8 @@ class AppConstants {
     if (kIsWeb) {
       return 'http://localhost:5000/api';
     } else if (Platform.isAndroid) {
-      return 'http://10.0.2.2:5000/api';
+      // Your machine's local Wi-Fi/Hotspot IP for physical mobile testing
+      return 'http://172.20.10.2:5000/api';
     } else {
       return 'http://localhost:5000/api';
     }

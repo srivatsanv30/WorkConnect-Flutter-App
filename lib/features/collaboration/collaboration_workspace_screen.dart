@@ -102,8 +102,7 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
+                          child: Wrap(spacing: 8, runSpacing: 4, children: [
                               Container(
                                 width: 48,
                                 height: 48,
@@ -125,14 +124,12 @@ class _CollaborationWorkspaceScreenState extends State<CollaborationWorkspaceScr
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: 6),
-                                    Row(
-                                      children: [
+                                    Wrap(spacing: 8, runSpacing: 4, children: [
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
                                           child: Text('Creator: ${(job['creator'] is Map) ? job['creator']['name'] ?? 'Unknown' : 'Unknown'}', style: TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold)),
                                         ),
-                                        SizedBox(width: 8),
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),

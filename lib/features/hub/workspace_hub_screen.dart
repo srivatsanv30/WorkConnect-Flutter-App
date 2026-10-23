@@ -98,7 +98,7 @@ class _WorkspaceHubScreenState extends State<WorkspaceHubScreen> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.1,
+              childAspectRatio: 1.0,
               children: [
                 StatCard(
                   icon: Icons.emoji_events_outlined,

@@ -60,6 +60,7 @@ class _MainShellState extends State<MainShell> {
             ),
       body: SafeArea(child: screens[_index]),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _index,
         onTap: _goTo,
         selectedFontSize: 11,

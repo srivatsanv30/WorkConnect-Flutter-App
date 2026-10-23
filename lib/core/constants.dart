@@ -13,14 +13,6 @@ class AppConstants {
 
   static const String appName = 'WorkConnect';
 
-  static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:5000/api';
-    } else if (Platform.isAndroid) {
-      // Your machine's local Wi-Fi/Hotspot IP for physical mobile testing
-      return 'http://172.20.10.2:5000/api';
-    } else {
-      return 'http://localhost:5000/api';
-    }
-  }
+  // Live cloud backend deployed on Render
+  static const String baseUrl = 'https://workconnect-flutter-app.onrender.com/api';
 }

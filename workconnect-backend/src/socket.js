@@ -30,28 +30,62 @@ function setupSocket(io) {
     });
 
     socket.on('send_message', async ({ jobId, text, imageUrl }) => {
-      if ((!text || !text.trim()) && !imageUrl) return;
+      try {
+        if ((!text || !text.trim()) && !imageUrl) return;
 
-      const job = await Job.findById(jobId);
-      if (!job) return;
+        const job = await Job.findById(jobId);
+        if (!job) return;
 
-      const isCreator = job.creator.toString() === socket.userId;
-      const isAssignee = job.assignedTo && job.assignedTo.toString() === socket.userId;
-      if (!isCreator && !isAssignee) return;
+        const isCreator = job.creator.toString() === socket.userId;
+        const isAssignee = job.assignedTo && job.assignedTo.toString() === socket.userId;
+        if (!isCreator && !isAssignee) return;
 
-      const message = await Message.create({
-        job: jobId,
-        sender: socket.userId,
-        text: text ? text.trim() : '',
-        imageUrl: imageUrl || null,
-      });
+        const message = await Message.create({
+          job: jobId,
+          sender: socket.userId,
+          text: text ? text.trim() : '',
+          imageUrl: imageUrl || null,
+        });
 
-      const populated = await message.populate('sender', 'name');
-      io.to(jobId).emit('new_message', populated);
+        const populated = await message.populate('sender', 'name');
+        io.to(jobId).emit('new_message', populated);
+      } catch (err) {
+        console.error('Socket send_message error:', err.message);
+      }
+    });
+
+    socket.on('delete_message', async ({ jobId, messageId, forEveryone }) => {
+      try {
+        const message = await Message.findById(messageId);
+        if (!message) return;
+
+        if (forEveryone) {
+          if (message.sender.toString() !== socket.userId) return;
+          message.isDeletedForEveryone = true;
+          message.text = '';
+          message.imageUrl = null;
+          await message.save();
+
+          io.to(jobId).emit('message_deleted', {
+            messageId: message._id.toString(),
+            isDeletedForEveryone: true,
+          });
+        } else {
+          if (!message.deletedFor.includes(socket.userId)) {
+            message.deletedFor.push(socket.userId);
+            await message.save();
+          }
+          socket.emit('message_deleted_for_me', {
+            messageId: message._id.toString(),
+          });
+        }
+      } catch (err) {
+        console.error('Socket delete_message error:', err.message);
+      }
     });
 
     socket.on('disconnect', () => {
-      // nothing needed for now
+      // client disconnected
     });
   });
 }

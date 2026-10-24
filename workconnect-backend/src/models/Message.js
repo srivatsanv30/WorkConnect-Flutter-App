@@ -6,6 +6,8 @@ const messageSchema = new mongoose.Schema(
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     text: { type: String, default: '' },
     imageUrl: { type: String, default: null },
+    isDeletedForEveryone: { type: Boolean, default: false },
+    deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

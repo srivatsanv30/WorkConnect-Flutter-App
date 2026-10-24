@@ -13,6 +13,18 @@ class AppConstants {
 
   static const String appName = 'WorkConnect';
 
-  // Live cloud backend deployed on Render
-  static const String baseUrl = 'https://workconnect-flutter-app.onrender.com/api';
+  /// Dynamically routes to local backend:
+  /// - Android Emulator: 10.0.2.2:5000
+  /// - Web / iOS / Desktop: localhost:5000
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:5000/api';
+    }
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:5000/api';
+      }
+    } catch (_) {}
+    return 'http://localhost:5000/api';
+  }
 }

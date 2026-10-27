@@ -11,3 +11,7 @@ android/.gradle/
 android/app/bin/
 src/config/serviceAccountKey.json
 .env.example
+
+# Python
+__pycache__/
+*.pyc
